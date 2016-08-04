@@ -3,10 +3,7 @@
 #include "../kodama/kodama.h"
 #include "../suzuha/suzuha_os.h"
 
-
 class CKodama robot;
-
-
 
 #define SENSOR_THREAD_STACK_SIZE	          128
 #define PRINT_THREAD_STACK_SIZE	            128
@@ -14,18 +11,24 @@ class CKodama robot;
 thread_stack_t sensor_thread_stack[SENSOR_THREAD_STACK_SIZE];
 thread_stack_t print_thread_stack[PRINT_THREAD_STACK_SIZE];
 
+class Vector<float, 1000> vect;
+
+ 
 
 void sensor_thread()
 {
+  int i;
+
+  for (i = 0; i < vect.size(); i++)
+    vect[i] = 3.45;
+
   robot.even_timer_set_period(0, 10);
 
   while (1)
   {
     if (robot.event_timer_cc(0))
     {
-      robot.gpio_on(LED_0);
       robot.imu_read();
-      robot.gpio_off(LED_0);
     }
   }
 }

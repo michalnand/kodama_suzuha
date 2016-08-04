@@ -9,6 +9,8 @@
 #include "imu.h"
 #include "pid.h"
 
+#include "vector.h"
+
 class CKodama: public CGPIO, public CTerminal, public CTimer, public CIMU
 {
   public:
