@@ -7,39 +7,53 @@ class CKodama robot;
 
 #define SENSOR_THREAD_STACK_SIZE	          128
 #define PRINT_THREAD_STACK_SIZE	            128
+#define AI_THREAD_STACK_SIZE                128
 
 thread_stack_t sensor_thread_stack[SENSOR_THREAD_STACK_SIZE];
 thread_stack_t print_thread_stack[PRINT_THREAD_STACK_SIZE];
+thread_stack_t ai_thread_stack[AI_THREAD_STACK_SIZE];
 
-class Vector<float, 1000> vect;
 
- 
+#define IMU_SAMPLING_PERIOD       10
 
 void sensor_thread()
 {
-  int i;
 
-  for (i = 0; i < vect.size(); i++)
-    vect[i] = 3.45;
+  robot.event_timer_set_period(0, IMU_SAMPLING_PERIOD);
 
-  robot.even_timer_set_period(0, 10);
-
+  uint8_t res;
   while (1)
   {
-    if (robot.event_timer_cc(0))
+    res = robot.event_timer_cc(0);
+
+    if (res != 0)
     {
       robot.imu_read();
+
+      if (res >= IMU_SAMPLING_PERIOD)
+        robot.printf("sensor RT warning %u\n", res);
+
     }
+  }
+}
+
+void ai_thread()
+{
+  while (1)
+  {
+    robot.delay_ms(10);
   }
 }
 
 void print_thread()
 {
-  robot.even_timer_set_period(1, 300);
+  robot.event_timer_set_period(1, 300);
+
+  uint8_t res;
 
   while (1)
   {
-    if (robot.event_timer_cc(1))
+    if ((res = robot.event_timer_cc(1)) != 0)
     {
       robot.gpio_on(LED_0);
 
@@ -49,6 +63,9 @@ void print_thread()
       robot.printf("\n");
 
       robot.gpio_off(LED_0);
+
+      if (res > RT_WARNING_TRESHOLD)
+        robot.printf("print RT warning %u\n", res);
     }
   }
 }
@@ -78,7 +95,10 @@ void usr_main()
       robot.printf(" [FAILED]\n");
   }
 
+
   create_thread(sensor_thread, sensor_thread_stack, sizeof(sensor_thread_stack), PRIORITY_MAX);
+  create_thread(ai_thread, ai_thread_stack, sizeof(ai_thread_stack), PRIORITY_MAX);
+
   create_thread(print_thread, print_thread_stack, sizeof(print_thread_stack), PRIORITY_MAX);
 
   kernel_start();

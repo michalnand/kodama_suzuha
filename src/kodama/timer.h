@@ -6,6 +6,8 @@
 
 #define EVENT_TIMER_COUNT     8
 
+#define RT_WARNING_TRESHOLD   1
+
 typedef long unsigned int time_t ;
 
 class CTimer
@@ -21,7 +23,7 @@ class CTimer
     void delay_loops(uint32_t loops);
     void delay_ms(uint32_t time_ms);
 
-    void even_timer_set_period(uint8_t timer_id, uint32_t period_ms);
+    void event_timer_set_period(uint8_t timer_id, uint32_t period_ms);
     uint8_t event_timer_cc(uint8_t timer_id);
 };
 

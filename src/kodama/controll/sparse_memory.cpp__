@@ -1,0 +1,325 @@
+#include "sparse_memory.h"
+
+
+CSparseMemory::CSparseMemory( unsigned int address_vector_size,
+                              unsigned int data_vector_size,
+                              unsigned int hard_locations_count,
+                              float distance_range, float error_treshold,
+                              float initial_coverage)
+{
+  this->address_vector_size = address_vector_size;
+  this->data_vector_size = data_vector_size;
+  this->hard_locations_count = hard_locations_count;
+
+  this->distance_range = distance_range;
+  this->error_treshold = error_treshold;
+
+  this->output_learning_rate = 0.5;   //learning rate
+  this->error_filter_k = 0.98;   //error filter constant
+
+  unsigned int i, j;
+
+  w = (float**)malloc(hard_locations_count*sizeof(float*));
+  for (j = 0; j < hard_locations_count; j++)
+  {
+    w[j] = (float*)malloc(address_vector_size*sizeof(float));
+    for (i = 0; i < address_vector_size; i++)
+      w[j][i] = 0.0;
+  }
+
+  output = (float**)malloc(hard_locations_count*sizeof(float*));
+  for (j = 0; j < hard_locations_count; j++)
+  {
+    output[j] = (float*)malloc(data_vector_size*sizeof(float));
+    for (i = 0; i < data_vector_size; i++)
+      output[j][i] = 0.0;
+  }
+
+  distance = (float*)malloc(hard_locations_count*sizeof(float));
+  for (i = 0; i < hard_locations_count; i++)
+    distance[i] = 0.0;
+
+  result = (float*)malloc(data_vector_size*sizeof(float));
+  for (i = 0; i < data_vector_size; i++)
+    result[i] = 0.0;
+
+
+  used_locations = initial_coverage*hard_locations_count;
+
+  error = (float*)malloc(hard_locations_count*sizeof(float));
+  for (j = 0; j < hard_locations_count; j++)
+    error[j] = 0.0;
+
+  nearest_count = 5;
+  nearest = (unsigned int*)malloc(hard_locations_count*sizeof(unsigned int));
+
+
+  erase();
+}
+
+CSparseMemory::~CSparseMemory()
+{
+  unsigned int j;
+
+  for (j = 0; j < hard_locations_count; j++)
+    free(w[j]);
+  free(w);
+
+  for (j = 0; j < hard_locations_count; j++)
+    free(output[j]);
+  free(output);
+
+  free(distance);
+  free(result);
+  free(error);
+
+  free(nearest);
+}
+
+void CSparseMemory::erase()
+{
+  unsigned int i, j;
+
+  for (j = 0; j < hard_locations_count; j++)
+    for (i = 0; i < address_vector_size; i++)
+    {
+      float r = ((rand()%20000000)/10000000.0) - 1.0;
+      this->w[j][i] = r;
+    }
+
+  for (j = 0; j < hard_locations_count; j++)
+    for (i = 0; i < data_vector_size; i++)
+      this->output[j][i] = 0.0;
+
+  for (i = 0; i < hard_locations_count; i++)
+    distance[i] = 0.0;
+
+  for (i = 0; i < data_vector_size; i++)
+    result[i] = 0.0;
+}
+
+void CSparseMemory::save(std::vector<float> *address_vector, std::vector<float> *data_vector)
+{
+  unsigned int i, j;
+
+  float *address = &(*address_vector)[0];
+
+  calc_distances(address);
+  find_nearest();
+
+  float activated_tmp = 0.0;
+
+  for (j = 0; j < nearest_count; j++)
+  {
+    unsigned int idx = nearest[j];
+
+    if (distance[idx] < distance_range)
+    {
+      for (i = 0; i < data_vector_size; i++)
+        output[idx][i] = (1.0 - output_learning_rate)*output[idx][i] + output_learning_rate*(*data_vector)[i];
+
+
+      float c = 0.9;
+      for (i = 0; i < address_vector_size; i++)
+        w[idx][i] = c*w[idx][i] + (1.0 - c)*(*address_vector)[i];
+
+      float relative_error = vector_relative_error(&(*data_vector)[0], output[idx], data_vector_size);
+
+      error[idx] = error_filter_k*error[idx] + (1.0 - error_filter_k)*relative_error;
+
+      unsigned int add_locations_count = 2;
+
+
+      if ((error[idx] > error_treshold) && (hard_locations_count > (used_locations + add_locations_count) ))
+      {
+        unsigned int k;
+
+        for (k = used_locations; k < (used_locations + add_locations_count); k++)
+        {
+          float c = (1.0 - 0.1*error[idx]);
+
+          for (i = 0; i < address_vector_size; i++)
+            w[k][i] = c*(*address_vector)[i] + (1.0 - c)*(((rand()%20000000)/10000000.0) - 1.0);
+
+
+          for (i = 0; i < data_vector_size; i++)
+            output[k][i] = (1.0 - output_learning_rate)*output[k][i] + output_learning_rate*(*data_vector)[i];
+        }
+
+        used_locations+= add_locations_count;
+      }
+
+      activated_tmp+= 1.0;
+    }
+  }
+
+  float k_ = 0.98;
+  activated = k_*activated + (1.0 - k_)*100.0*activated_tmp/hard_locations_count;
+}
+
+float* CSparseMemory::load(std::vector<float> *address_vector)
+{
+  unsigned int i, j;
+
+  float *address = &(*address_vector)[0];
+
+  calc_distances(address);
+  find_nearest();
+
+  float count = 0.0;
+
+  for (i = 0; i < data_vector_size; i++)
+    result[i] = 0.0;
+
+  for (j = 0; j < nearest_count; j++)
+  {
+    unsigned int idx = nearest[j];
+    if (distance[idx] < distance_range)
+    {
+      float w = 1.0;
+    //  w = 1.0 - distance[idx];
+
+      for (i = 0; i < data_vector_size; i++)
+        result[i]+= output[idx][i]*w;
+      count+= w;
+    }
+  }
+
+  if (count > 0.0)
+    for (i = 0; i < data_vector_size; i++)
+      result[i]/= count;
+
+  return result;
+}
+
+float* CSparseMemory::get_result()
+{
+  return result;
+}
+
+
+
+float CSparseMemory::vector_angle(float *va, float *vb, unsigned int size)
+{
+  float dot_prod = 0.0;
+  float size_a = 0.0;
+  float size_b = 0.0;
+
+  unsigned int i;
+  for (i = 0; i < size; i++)
+  {
+    dot_prod+= va[i]*vb[i];
+    size_a+= va[i]*va[i];
+    size_b+= vb[i]*vb[i];
+  }
+
+  float tmp = sqrt(size_a)*sqrt(size_b);
+  float res = 0.0;
+
+  if (tmp > 0.0)
+    res = dot_prod/tmp;
+
+  return res;
+}
+
+void CSparseMemory::calc_distances(float *address_vector)
+{
+  unsigned int j;
+
+  float max_value = -10000000.0;
+  float min_value = -max_value;
+
+  for (j = 0; j < used_locations; j++)
+  {
+    float dist = vector_angle(w[j], address_vector, address_vector_size);
+
+    dist = 1.0 - dist*dist;
+    distance[j] = dist;
+
+    if (min_value > dist)
+      min_value = dist;
+
+    if (max_value < dist)
+      max_value = dist;
+  }
+
+  if (max_value > min_value)
+  {
+    float k = 1.0/(max_value - min_value);
+    float q = 1.0 - k*max_value;
+
+    for (j = 0; j < used_locations; j++)
+      distance[j] = k*distance[j] + q;
+  }
+}
+
+float CSparseMemory::vector_relative_error(float *va, float *vb, unsigned int size)
+{
+  unsigned int i;
+
+  float dif = 0.0;
+  float vect_size = 0.0;
+
+  for (i = 0; i < size; i++)
+  {
+    dif+= (va[i] - vb[i])*(va[i] - vb[i]);
+    vect_size+= va[i]*va[i];
+  }
+
+  dif = sqrt(dif);
+
+  return dif;
+}
+
+
+void CSparseMemory::find_nearest()
+{
+  unsigned int i, j;
+
+  for (j = 0; j < used_locations; j++)
+    nearest[j] = j;
+
+  for (j = 0; j < nearest_count; j++)
+  {
+    for (i = 0; i < used_locations; i++)
+      if (distance[nearest[i]] < distance[nearest[j]])
+      {
+        unsigned int tmp = nearest[j];
+        nearest[j] = nearest[i];
+        nearest[i] = tmp;
+      }
+  }
+}
+
+
+#include <stdio.h>
+#include "common/common.h"
+
+
+float CSparseMemory::get_utilization()
+{
+  unsigned int j;
+  float used = 0.0;
+
+  for (j = 0; j < used_locations; j++)
+    if (error[j] > 0.0)
+      used+= 1.0;
+
+  return used/hard_locations_count;
+}
+
+void CSparseMemory::save_hard_locations(char *file_name)
+{
+  unsigned int i, j;
+
+
+  CLog log(file_name, address_vector_size);
+
+  for (j = 0; j < used_locations; j++)
+  {
+    for (i = 0; i < address_vector_size; i++)
+      log.add(i, w[j][i]);
+  }
+
+  log.save();
+}

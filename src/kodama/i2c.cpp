@@ -97,33 +97,40 @@ int CI2C::i2cWrite(uint8_t a)
 uint8_t CI2C::i2cRead(uint8_t  ack)
 {
     uint8_t  i;
-    uint8_t  caracter = 0x00;
+    uint8_t  c = 0x00;
 
     SetLowSCL();
-    SetHighSDA();
 
     for (i = 0; i < 8; i++)
     {
-        caracter = caracter << 1;
+        c = c << 1;
         SetHighSCL();
 
         if (I2C_GPIO->IDR&(1<<SDA))
-            caracter = caracter  + 1;
+            c = c | 0x01;
 
         SetLowSCL();
     }
 
-    if (ack)
-    {
-        SetLowSDA();
-    }
 
-    SetHighSCL();
-    SetLowSCL();
+   if (ack > 0)
+   {
+     //0
+      SetLowSDA();
+      SetHighSCL();
+      SetLowSCL();
+   }
+   else
+   {
+     //1
+     SetHighSDA();
+     SetHighSCL();
+     SetLowSCL();
+     SetLowSDA();
+   }
 
-    i2c_delay();
 
-    return (caracter);
+    return (c);
 }
 
 
@@ -156,13 +163,14 @@ uint8_t CI2C::i2c_read_reg(uint8_t dev_adr, uint8_t reg_adr)
 
 void CI2C::i2c_delay()
 {
-    uint8_t loops = 4;
-    while (loops--)
+  uint8_t loops = 4;
+  while (loops--)
       __asm("nop");
 }
 
 void CI2C::SetLowSDA()
 {
+
     GPIO_InitTypeDef GPIO_InitStruct;
 
     GPIO_InitStruct.GPIO_Pin = (1<<SDA);
@@ -172,13 +180,21 @@ void CI2C::SetLowSDA()
     GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL; // this disables resistor
     GPIO_Init(I2C_GPIO, &GPIO_InitStruct);
 
-    GPIO_ResetBits(I2C_GPIO, 1<<SDA);
+    /*
+    I2C_GPIO->OTYPER &= ~((GPIO_OTYPER_OT_0) << ((uint16_t)SDA));
+    I2C_GPIO->OTYPER |= (uint16_t)(((uint16_t)GPIO_OType_OD) << ((uint16_t)SDA));
+
+    I2C_GPIO->MODER  &= ~(GPIO_MODER_MODER0 << (SDA * 2));
+    I2C_GPIO->MODER |= (((uint32_t)GPIO_Mode_IN) << (SDA * 2));
+    */
+    I2C_GPIO->BRR = (1<<SDA);
 
     i2c_delay();
 }
 
 void CI2C::SetHighSDA()
 {
+/*
     GPIO_InitTypeDef GPIO_InitStruct;
 
     GPIO_InitStruct.GPIO_Pin = (1<<SDA);
@@ -187,21 +203,25 @@ void CI2C::SetHighSDA()
     GPIO_InitStruct.GPIO_OType = GPIO_OType_OD; // this sets the pin type to open drain
     GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL; // this disables resistor
     GPIO_Init(I2C_GPIO, &GPIO_InitStruct);
+*/
+
+    I2C_GPIO->MODER  &= ~(GPIO_MODER_MODER0 << (SDA * 2));
+    I2C_GPIO->MODER |= (((uint32_t)GPIO_Mode_IN) << (SDA * 2));
 
 
-    GPIO_SetBits(I2C_GPIO, 1<<SDA);
+    I2C_GPIO->BSRR = (1<<SDA);
 
     i2c_delay();
 }
 
 void CI2C::SetLowSCL()
 {
-    GPIO_ResetBits(I2C_GPIO, 1<<SCL);
+    I2C_GPIO->BRR = (1<<SCL);
     i2c_delay();
 }
 
 void CI2C::SetHighSCL()
 {
-    GPIO_SetBits(I2C_GPIO, 1<<SCL);
+    I2C_GPIO->BSRR = (1<<SCL);
     i2c_delay();
 }

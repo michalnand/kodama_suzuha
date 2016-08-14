@@ -125,10 +125,32 @@ void CIMU::imu_read()
 {
   uint16_t tmp;
 
-	//read gyroscope
-	tmp = ((uint16_t)i2c_read_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_OUT_X_L_G));
-	tmp|= ((uint16_t)i2c_read_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_OUT_X_H_G))<<8;
-	gx = tmp;
+/*
+  i2cStart();
+  i2cWrite(LSM9DS0_GYRO_ADDRESS);  // slave address, write command
+  i2cWrite(LSM9DS0_OUT_X_L_G);  // send reg address
+
+  i2cStart();
+  i2cWrite(LSM9DS0_GYRO_ADDRESS|0x01); // slave address, read command
+
+  tmp = (uint16_t)i2cRead(1);   //read data
+  tmp|= ((uint16_t)i2cRead(1))<<8;   //read data
+  gx = tmp;
+
+  tmp = (uint16_t)i2cRead(1);   //read data
+  tmp|= ((uint16_t)i2cRead(1))<<8;   //read data
+  gy = tmp;
+
+  tmp = (uint16_t)i2cRead(1);   //read data
+  tmp|= ((uint16_t)i2cRead(0))<<8;   //read data
+  gz = tmp;
+
+  i2cStop();
+*/
+
+  tmp = ((uint16_t)i2c_read_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_OUT_X_L_G));
+  tmp|= ((uint16_t)i2c_read_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_OUT_X_H_G))<<8;
+  gx = tmp;
 
 	tmp = ((uint16_t)i2c_read_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_OUT_Y_L_G));
 	tmp|= ((uint16_t)i2c_read_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_OUT_Y_H_G))<<8;
@@ -137,7 +159,6 @@ void CIMU::imu_read()
 	tmp = ((uint16_t)i2c_read_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_OUT_Z_L_G));
 	tmp|= ((uint16_t)i2c_read_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_OUT_Z_H_G))<<8;
 	gz = tmp;
-
 
 	//read magnetometer
 	tmp = ((uint16_t)i2c_read_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_OUT_X_L_M));

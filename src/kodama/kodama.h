@@ -7,9 +7,10 @@
 #include "terminal.h"
 #include "timer.h"
 #include "imu.h"
-#include "pid.h"
 
-#include "vector.h"
+#include "controll/vector.h"
+#include "controll/pid.h"
+#include "controll/sparse_memory.h"
 
 class CKodama: public CGPIO, public CTerminal, public CTimer, public CIMU
 {

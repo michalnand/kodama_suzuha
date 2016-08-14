@@ -2,7 +2,7 @@
 
 CKodama::CKodama()
 {
-  init();
+  init(); 
 }
 
 CKodama::~CKodama()

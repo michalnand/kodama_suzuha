@@ -20,7 +20,7 @@ CFLAGS+= -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align
 CFLAGS+= $(TARGET) -fdata-sections -ffunction-sections
 CFLAGS+= $(THIRD_PARTY_LIBS_INC)
 
-CXXFLAGS = -O2 -Os -s -Wall -Wextra -pedantic -std=c++11 -fno-rtti -fno-exceptions
+CXXFLAGS = -O2 -Os -s -Wall -Wextra -pedantic -std=c++11  -fno-rtti -fno-exceptions
 CXXFLAGS+= -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align
 CXXFLAGS+= $(TARGET) -fdata-sections -ffunction-sections
 CXXFLAGS+= $(THIRD_PARTY_LIBS_INC)

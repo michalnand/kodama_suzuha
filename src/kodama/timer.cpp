@@ -4,9 +4,12 @@
 
 volatile time_t __system_time__;
 
+
 volatile uint32_t __event_timer_cnt__[EVENT_TIMER_COUNT];
 volatile uint32_t __event_timer_csr__[EVENT_TIMER_COUNT];
 volatile uint8_t __event_timer_flag__[EVENT_TIMER_COUNT];
+
+
 
 CTimer::CTimer()
 {
@@ -66,12 +69,16 @@ void TIM3_IRQHandler()
   uint32_t i;
   for (i = 0; i < EVENT_TIMER_COUNT; i++)
   {
+    if ((__event_timer_flag__[i] != 0) && (__event_timer_flag__[i] < 255))
+      __event_timer_flag__[i]++;
+
     if (__event_timer_cnt__[i])
       __event_timer_cnt__[i]--;
     else
     {
       __event_timer_cnt__[i] = __event_timer_csr__[i];
-      __event_timer_flag__[i] = 1;
+      if (__event_timer_flag__[i] == 0)
+        __event_timer_flag__[i] = 1;
     }
   }
   __system_time__++;
@@ -109,7 +116,7 @@ void CTimer::delay_ms(uint32_t time_ms)
     core_yield();
 }
 
-void CTimer::even_timer_set_period(uint8_t timer_id, uint32_t period_ms)
+void CTimer::event_timer_set_period(uint8_t timer_id, uint32_t period_ms)
 {
   __disable_irq();
 	period_ms*= 10;
@@ -121,14 +128,15 @@ void CTimer::even_timer_set_period(uint8_t timer_id, uint32_t period_ms)
 
 uint8_t CTimer::event_timer_cc(uint8_t timer_id)
 {
+  uint8_t res = 0;
+
   if (__event_timer_flag__[timer_id] != 0)
   {
 		__disable_irq();
+    res = __event_timer_flag__[timer_id];
 	  __event_timer_flag__[timer_id] = 0;
 	  __enable_irq();
-
-    return 1;
   }
 
-  return 0;
+  return res;
 }

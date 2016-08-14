@@ -4,8 +4,7 @@
 
 void sys_tick_init()
 {
-  //SysTick->LOAD  = 168000;                       /* set reload register */
-  SysTick->LOAD  = 18000;                       /* set reload register */
+  SysTick->LOAD  = 15000;                       /* set reload register */
   NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority for Systick Interrupt */
   SysTick->VAL   = 0;                                          /* Load the SysTick Counter Value */
   SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |
