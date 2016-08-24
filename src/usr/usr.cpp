@@ -1,7 +1,7 @@
 #include "usr.h"
 
-#include "../kodama/kodama.h"
-#include "../suzuha/suzuha_os.h"
+#include <kodama.h>
+#include <suzuha_os.h>
 
 class CKodama robot;
 
@@ -29,6 +29,8 @@ void sensor_thread()
     if (res != 0)
     {
       robot.imu_read();
+      robot.rgb_read();
+      robot.motor_refresh();
 
       if (res >= IMU_SAMPLING_PERIOD)
         robot.printf("sensor RT warning %u\n", res);
@@ -39,6 +41,32 @@ void sensor_thread()
 
 void ai_thread()
 {
+  robot.motor_set(MOTOR_LEFT, SPEED_MAX); robot.motor_set(MOTOR_RIGHT, 0);
+  robot.delay_ms(800);
+
+
+  robot.motor_set(MOTOR_LEFT, -SPEED_MAX); robot.motor_set(MOTOR_RIGHT, 0);
+  robot.delay_ms(800);
+
+
+  robot.motor_set(MOTOR_LEFT, 0); robot.motor_set(MOTOR_RIGHT, SPEED_MAX);
+  robot.delay_ms(800);
+
+
+  robot.motor_set(MOTOR_LEFT, 0); robot.motor_set(MOTOR_RIGHT, -SPEED_MAX);
+  robot.delay_ms(800);
+
+
+  robot.motor_set(MOTOR_LEFT, SPEED_MAX); robot.motor_set(MOTOR_RIGHT, SPEED_MAX);
+  robot.delay_ms(800);
+
+
+  robot.motor_set(MOTOR_LEFT, -SPEED_MAX); robot.motor_set(MOTOR_RIGHT, -SPEED_MAX);
+  robot.delay_ms(800);
+
+
+  robot.motor_set(MOTOR_LEFT, 0); robot.motor_set(MOTOR_RIGHT, 0);
+
   while (1)
   {
     robot.delay_ms(10);
@@ -47,8 +75,9 @@ void ai_thread()
 
 void print_thread()
 {
-  robot.event_timer_set_period(1, 300);
+  robot.event_timer_set_period(1, 500);
 
+  unsigned int i;
   uint8_t res;
 
   while (1)
@@ -62,10 +91,41 @@ void print_thread()
       robot.printf("angles %i %i %i\n", robot.imu_get()->roll, robot.imu_get()->pitch, robot.imu_get()->yaw);
       robot.printf("\n");
 
+
+      struct sRGBResult *rgb_result = robot.get_rgb_result();
+
+      robot.printf("\n");
+      for (i = 0; i < RGB_SENSORS_COUNT; i++)
+        robot.printf("%i ", rgb_result->r[i]);
+
+      robot.printf("\n");
+      for (i = 0; i < RGB_SENSORS_COUNT; i++)
+        robot.printf("%i ", rgb_result->g[i]);
+
+      robot.printf("\n");
+      for (i = 0; i < RGB_SENSORS_COUNT; i++)
+        robot.printf("%i ", rgb_result->b[i]);
+
+      robot.printf("\n");
+      robot.printf("\n");
+
+
+
+      robot.printf("\n");
+      for (i = 0; i < RGB_SENSORS_COUNT; i++)
+        robot.printf("%i ", rgb_result->r_normalised[i]);
+
+      robot.printf("\n");
+      for (i = 0; i < RGB_SENSORS_COUNT; i++)
+        robot.printf("%i ", rgb_result->g_normalised[i]);
+
+      robot.printf("\n");
+      for (i = 0; i < RGB_SENSORS_COUNT; i++)
+        robot.printf("%i ", rgb_result->b_normalised[i]);
+
+
       robot.gpio_off(LED_0);
 
-      if (res > RT_WARNING_TRESHOLD)
-        robot.printf("print RT warning %u\n", res);
     }
   }
 }
@@ -85,7 +145,6 @@ void usr_main()
 
     robot.printf("kodama init %i %i : ", i, res);
 
-
     if (res == 0)
     {
       robot.printf(" [OK]\n");
@@ -95,11 +154,29 @@ void usr_main()
       robot.printf(" [FAILED]\n");
   }
 
+  if (res != 0)
+    robot.error();
 
-  create_thread(sensor_thread, sensor_thread_stack, sizeof(sensor_thread_stack), PRIORITY_MAX);
-  create_thread(ai_thread, ai_thread_stack, sizeof(ai_thread_stack), PRIORITY_MAX);
+  robot.sleep();
 
-  create_thread(print_thread, print_thread_stack, sizeof(print_thread_stack), PRIORITY_MAX);
+  while (1)
+  {
+    if (robot.gpio_in(KEY) != 0)
+    {
+      robot.wakeup();
+
+      create_thread(sensor_thread, sensor_thread_stack, sizeof(sensor_thread_stack), PRIORITY_MAX);
+      create_thread(ai_thread, ai_thread_stack, sizeof(ai_thread_stack), PRIORITY_MAX);
+      create_thread(print_thread, print_thread_stack, sizeof(print_thread_stack), PRIORITY_MAX);
+      break;
+    }
+
+    robot.gpio_on(LED_0);
+    robot.delay_ms(10);
+
+    robot.gpio_off(LED_0);
+    robot.delay_ms(300);
+  }
 
   kernel_start();
 }

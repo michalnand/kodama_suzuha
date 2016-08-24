@@ -7,17 +7,17 @@
 class CPID
 {
   private:
-    int32_t e0, e1, e2;
-    int32_t k0, k1, k2;
-    int32_t u, output_range;
+    float e0, e1, e2;
+    float k0, k1, k2;
+    float u, output_range;
 
   public:
-    CPID(int32_t kp, int32_t ki, int32_t kd, int32_t output_range);
+    CPID(float kp, float ki, float kd, float output_range);
     ~CPID();
 
-    void init(int32_t kp, int32_t ki, int32_t kd, int32_t output_range);
+    void init(float kp, float ki, float kd, float output_range);
 
-    int32_t process(int32_t error);
+    float process(float error);
 };
 
 

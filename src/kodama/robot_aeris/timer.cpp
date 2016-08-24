@@ -1,6 +1,6 @@
 #include "timer.h"
 
-#include "../device/device.h"
+#include <device.h>
 
 volatile time_t __system_time__;
 

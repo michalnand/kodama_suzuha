@@ -1,17 +1,8 @@
 #include "i2c.h"
-#include "../device/device.h"
+#include <device.h>
 
-CI2C::CI2C()
-{
-  i2c_init();
-}
 
-CI2C::~CI2C()
-{
-
-}
-
-void CI2C::i2c_init()
+void i2c_init()
 {
     RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIO_I2C, ENABLE);
 
@@ -31,7 +22,7 @@ void CI2C::i2c_init()
 
 
 
-void CI2C::i2cStart()
+void i2cStart()
 {
     SetHighSCL();
     SetHighSDA();
@@ -44,7 +35,7 @@ void CI2C::i2cStart()
 }
 
 
-void CI2C::i2cStop()
+void i2cStop()
 {
     SetLowSCL();
     SetLowSDA();
@@ -58,7 +49,7 @@ void CI2C::i2cStop()
 
 
 
-int CI2C::i2cWrite(uint8_t a)
+int i2cWrite(uint8_t a)
 {
     uint8_t  i;
     uint8_t  return_ack;
@@ -94,7 +85,7 @@ int CI2C::i2cWrite(uint8_t a)
 }
 
 
-uint8_t CI2C::i2cRead(uint8_t  ack)
+uint8_t i2cRead(uint8_t  ack)
 {
     uint8_t  i;
     uint8_t  c = 0x00;
@@ -134,7 +125,7 @@ uint8_t CI2C::i2cRead(uint8_t  ack)
 }
 
 
-void CI2C::i2c_write_reg(uint8_t dev_adr, uint8_t reg_adr, uint8_t value)
+void i2c_write_reg(uint8_t dev_adr, uint8_t reg_adr, uint8_t value)
 {
     i2cStart();
     i2cWrite(dev_adr);  /*slave address, write command*/
@@ -143,7 +134,7 @@ void CI2C::i2c_write_reg(uint8_t dev_adr, uint8_t reg_adr, uint8_t value)
     i2cStop();
 }
 
-uint8_t CI2C::i2c_read_reg(uint8_t dev_adr, uint8_t reg_adr)
+uint8_t i2c_read_reg(uint8_t dev_adr, uint8_t reg_adr)
 {
     uint8_t res;
 
@@ -161,14 +152,14 @@ uint8_t CI2C::i2c_read_reg(uint8_t dev_adr, uint8_t reg_adr)
 
 
 
-void CI2C::i2c_delay()
+void i2c_delay()
 {
   uint8_t loops = 4;
   while (loops--)
       __asm("nop");
 }
 
-void CI2C::SetLowSDA()
+void SetLowSDA()
 {
 
     GPIO_InitTypeDef GPIO_InitStruct;
@@ -192,7 +183,7 @@ void CI2C::SetLowSDA()
     i2c_delay();
 }
 
-void CI2C::SetHighSDA()
+void SetHighSDA()
 {
 /*
     GPIO_InitTypeDef GPIO_InitStruct;
@@ -212,15 +203,15 @@ void CI2C::SetHighSDA()
     I2C_GPIO->BSRR = (1<<SDA);
 
     i2c_delay();
-}
+} 
 
-void CI2C::SetLowSCL()
+void SetLowSCL()
 {
     I2C_GPIO->BRR = (1<<SCL);
     i2c_delay();
 }
 
-void CI2C::SetHighSCL()
+void SetHighSCL()
 {
     I2C_GPIO->BSRR = (1<<SCL);
     i2c_delay();

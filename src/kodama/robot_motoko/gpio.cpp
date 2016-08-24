@@ -1,6 +1,6 @@
 #include "gpio.h"
 
-#include "../device/device.h"
+#include <device.h>
 
 volatile uint32_t g_left_encoder, g_right_encoder;
 

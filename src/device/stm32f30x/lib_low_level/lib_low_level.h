@@ -16,13 +16,6 @@ extern "C" {
 #include "stm32f30x_syscfg.h"
 
 
-
-//TODO
-#include "pwm/pwm.h"
-#include "pwm/drv8834.h"
-
-
-
 #include "gpio/stm32f30x_gpio.h"
 #include "gpio/stm32f30x_exti.h"
 #include "uart/stm32f30x_usart.h"

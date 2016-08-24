@@ -1,7 +1,7 @@
 #include "terminal.h"
 
 #include "stdarg.h"
-#include "../device/device.h"
+#include <device.h>
 
 
 #define UART_BAUD_RATE          115200

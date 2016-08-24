@@ -4,8 +4,9 @@
 
 #define SUZUHA_OS 		1
 
-#include "../options.h"
-#include "../device/device.h"
+#include <device.h>
+
+#include "options.h"
 #include "kernel/kernel.h"
 #include "lib/lib_os.h"
 
