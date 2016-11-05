@@ -113,6 +113,10 @@ int32_t CIMU::imu_init()
 
   temperature = 0;
 
+  imu_result.roll_ = 0;
+  imu_result.pitch_ = 0;
+  imu_result.yaw_ = 0;
+
   imu_result.roll = 0;
   imu_result.pitch = 0;
   imu_result.yaw = 0;
@@ -194,12 +198,17 @@ void CIMU::imu_read()
 	temperature = tmp;
 
 
-  imu_result.roll = imu_result.roll + ((int32_t)gx - gx_ofs)/(int32_t)200;
-  imu_result.pitch = imu_result.pitch + ((int32_t)gy - gy_ofs)/(int32_t)200;
-  imu_result.yaw = imu_result.yaw + ((int32_t)gz - gz_ofs)/(int32_t)200;
+  imu_result.roll_ = imu_result.roll_ + ((int32_t)gx - gx_ofs)/(int32_t)200;
+  imu_result.pitch_ = imu_result.pitch_ + ((int32_t)gy - gy_ofs)/(int32_t)200;
+  imu_result.yaw_ = imu_result.yaw_ + ((int32_t)gz - gz_ofs)/(int32_t)200;
   imu_result.ax = ax;
   imu_result.ay = ay;
   imu_result.az = az;
+
+
+  imu_result.roll = (imu_result.roll_*900)/1300; 
+  imu_result.pitch = (imu_result.pitch_*900)/1300;
+  imu_result.yaw = (imu_result.yaw_*900)/1300;
 }
 
 struct sIMUSensor* CIMU::imu_get()

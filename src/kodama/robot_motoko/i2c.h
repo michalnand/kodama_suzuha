@@ -19,24 +19,26 @@ class CI2C
     CI2C();
     ~CI2C();
 
-    void i2c_init();
+    void init();
 
-    void i2cStart();
-    void i2cStop();
+    void Start();
+    void Stop();
 
-    int i2cWrite(uint8_t a);
-    uint8_t i2cRead(uint8_t  ack);
+    int Write(uint8_t a);
+    uint8_t Read(uint8_t  ack);
 
-    void i2c_write_reg(uint8_t dev_adr, uint8_t reg_adr, uint8_t value);
-    uint8_t i2c_read_reg(uint8_t dev_adr, uint8_t reg_adr);
+    void write_reg(uint8_t dev_adr, uint8_t reg_adr, uint8_t value);
+    uint8_t read_reg(uint8_t dev_adr, uint8_t reg_adr);
 
   private:
-    void i2c_delay();
+    void delay();
     void SetLowSDA();
     void SetHighSDA();
 
     void SetLowSCL();
     void SetHighSCL();
 };
+
+extern CI2C i2c;
 
 #endif

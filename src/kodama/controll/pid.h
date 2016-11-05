@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+//discrete PID controller implementation
 
 class CPID
 {
@@ -12,11 +13,20 @@ class CPID
     float u, output_range;
 
   public:
+    //create controller
+    //@param kp - proportional constant
+    //@param ki - integration constant
+    //@param kd - derivative constant
+    //@param output_range - maximum otput range, limits output into <-output_range, output_range>
     CPID(float kp, float ki, float kd, float output_range);
     ~CPID();
 
+    //new initialization of parameters see CPID
     void init(float kp, float ki, float kd, float output_range);
 
+    //process one discrete controller step
+    //@param error, required_value - meassured_value
+    //return controller output
     float process(float error);
 };
 

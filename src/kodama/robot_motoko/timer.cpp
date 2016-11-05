@@ -13,7 +13,7 @@ volatile uint8_t __event_timer_flag__[EVENT_TIMER_COUNT];
 
 CTimer::CTimer()
 {
-  timer_init();
+
 }
 
 CTimer::~CTimer()
@@ -126,7 +126,7 @@ void CTimer::event_timer_set_period(uint8_t timer_id, uint32_t period_ms)
 	__enable_irq();
 }
 
-uint8_t CTimer::event_timer_cc(uint8_t timer_id)
+uint8_t CTimer::event_timer_check(uint8_t timer_id)
 {
   uint8_t res = 0;
 

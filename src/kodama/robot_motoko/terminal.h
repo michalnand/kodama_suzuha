@@ -1,5 +1,5 @@
-#ifndef _USART_H_
-#define _USART_H_
+#ifndef _TERMINAL_H_
+#define _TERMINAL_H_
 
 
 #include <stdint.h>

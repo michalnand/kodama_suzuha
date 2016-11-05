@@ -1,13 +1,22 @@
 #ifndef _VECTOR_H_
 #define _VECTOR_H_
 
-
 template <class t_type, int _size> class Vector
 {
-  private:
+  public:
     t_type arr[_size];
 
   public:
+    Vector()
+    {
+
+    }
+
+    ~Vector()
+    {
+
+    }
+
     t_type &operator[](int idx)
     {
       return arr[idx];
@@ -18,5 +27,6 @@ template <class t_type, int _size> class Vector
       return _size;
     }
 };
+
 
 #endif

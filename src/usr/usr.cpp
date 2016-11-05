@@ -3,8 +3,6 @@
 #include <kodama.h>
 #include <suzuha_os.h>
 
-class CKodama robot;
-
 #define SENSOR_THREAD_STACK_SIZE	          128
 #define PRINT_THREAD_STACK_SIZE	            128
 #define AI_THREAD_STACK_SIZE                128
@@ -13,118 +11,113 @@ thread_stack_t sensor_thread_stack[SENSOR_THREAD_STACK_SIZE];
 thread_stack_t print_thread_stack[PRINT_THREAD_STACK_SIZE];
 thread_stack_t ai_thread_stack[AI_THREAD_STACK_SIZE];
 
+#define SENSOR_SAMPLING_PERIOD       20
 
-#define IMU_SAMPLING_PERIOD       10
+class CKodama kodama;
 
 void sensor_thread()
 {
-
-  robot.event_timer_set_period(0, IMU_SAMPLING_PERIOD);
+  kodama.event_timer_set_period(0, SENSOR_SAMPLING_PERIOD);
 
   uint8_t res;
   while (1)
   {
-    res = robot.event_timer_cc(0);
+    res = kodama.event_timer_check(0);
 
     if (res != 0)
     {
-      robot.imu_read();
-      robot.rgb_read();
-      robot.motor_refresh();
+      kodama.imu_read();
+      kodama.rgb_read();
 
-      if (res >= IMU_SAMPLING_PERIOD)
-        robot.printf("sensor RT warning %u\n", res);
-
+      if (res >= SENSOR_SAMPLING_PERIOD)
+        kodama.printf("sensor RT warning %u\n", res);
     }
   }
 }
 
-void ai_thread()
-{
-  robot.motor_set(MOTOR_LEFT, SPEED_MAX); robot.motor_set(MOTOR_RIGHT, 0);
-  robot.delay_ms(800);
-
-
-  robot.motor_set(MOTOR_LEFT, -SPEED_MAX); robot.motor_set(MOTOR_RIGHT, 0);
-  robot.delay_ms(800);
-
-
-  robot.motor_set(MOTOR_LEFT, 0); robot.motor_set(MOTOR_RIGHT, SPEED_MAX);
-  robot.delay_ms(800);
-
-
-  robot.motor_set(MOTOR_LEFT, 0); robot.motor_set(MOTOR_RIGHT, -SPEED_MAX);
-  robot.delay_ms(800);
-
-
-  robot.motor_set(MOTOR_LEFT, SPEED_MAX); robot.motor_set(MOTOR_RIGHT, SPEED_MAX);
-  robot.delay_ms(800);
-
-
-  robot.motor_set(MOTOR_LEFT, -SPEED_MAX); robot.motor_set(MOTOR_RIGHT, -SPEED_MAX);
-  robot.delay_ms(800);
-
-
-  robot.motor_set(MOTOR_LEFT, 0); robot.motor_set(MOTOR_RIGHT, 0);
-
-  while (1)
-  {
-    robot.delay_ms(10);
-  }
-}
 
 void print_thread()
 {
-  robot.event_timer_set_period(1, 500);
+  kodama.event_timer_set_period(1, 500);
 
   unsigned int i;
   uint8_t res;
 
+  kodama.set_motor(MOTOR_LEFT, SPEED_MAX);
+  kodama.delay_ms(300);
+
+  kodama.set_motor(MOTOR_LEFT, -SPEED_MAX);
+  kodama.delay_ms(300);
+
+  kodama.set_motor(MOTOR_LEFT, 0);
+  kodama.delay_ms(300);
+
+
+  kodama.set_motor(MOTOR_RIGHT, SPEED_MAX);
+  kodama.delay_ms(300);
+
+  kodama.set_motor(MOTOR_RIGHT, -SPEED_MAX);
+  kodama.delay_ms(300);
+
+  kodama.set_motor(MOTOR_RIGHT, 0);
+  kodama.delay_ms(300);
+
+
+  kodama.set_motor(MOTOR_RIGHT, SPEED_MAX);
+  kodama.set_motor(MOTOR_LEFT, SPEED_MAX);
+  kodama.delay_ms(300);
+
+  kodama.set_motor(MOTOR_RIGHT, 0);
+  kodama.set_motor(MOTOR_LEFT, 0);
+
   while (1)
   {
-    if ((res = robot.event_timer_cc(1)) != 0)
+    if ((res = kodama.event_timer_check(1)) != 0)
     {
-      robot.gpio_on(LED_0);
+      kodama.gpio_on(LED_0);
 
-      robot.printf("system time %u\n", robot.get_time());
-      robot.printf("encoders %i %i\n", robot.get_left_encoder(), robot.get_right_encoder());
-      robot.printf("angles %i %i %i\n", robot.imu_get()->roll, robot.imu_get()->pitch, robot.imu_get()->yaw);
-      robot.printf("\n");
+      kodama.printf("\n");
 
 
-      struct sRGBResult *rgb_result = robot.get_rgb_result();
+      kodama.printf("system time %u\n", kodama.get_time());
+      kodama.printf("encoders %i %i\n", kodama.get_left_encoder(), kodama.get_right_encoder());
+      kodama.printf("angles %i %i %i\n", kodama.get_imu_result()->roll, kodama.get_imu_result()->pitch, kodama.get_imu_result()->yaw);
+      kodama.printf("\n");
 
-      robot.printf("\n");
+
+      struct sRGBResult *rgb_result = kodama.get_rgb_result();
+
+      kodama.printf("\n");
       for (i = 0; i < RGB_SENSORS_COUNT; i++)
-        robot.printf("%i ", rgb_result->r[i]);
+        kodama.printf("%i ", rgb_result->r[i]);
 
-      robot.printf("\n");
+      kodama.printf("\n");
       for (i = 0; i < RGB_SENSORS_COUNT; i++)
-        robot.printf("%i ", rgb_result->g[i]);
+        kodama.printf("%i ", rgb_result->g[i]);
 
-      robot.printf("\n");
+      kodama.printf("\n");
       for (i = 0; i < RGB_SENSORS_COUNT; i++)
-        robot.printf("%i ", rgb_result->b[i]);
+        kodama.printf("%i ", rgb_result->b[i]);
 
-      robot.printf("\n");
-      robot.printf("\n");
+      kodama.printf("\n");
+      kodama.printf("\n");
 
 
 
-      robot.printf("\n");
+      kodama.printf("\n");
       for (i = 0; i < RGB_SENSORS_COUNT; i++)
-        robot.printf("%i ", rgb_result->r_normalised[i]);
+        kodama.printf("%i ", rgb_result->r_normalised[i]);
 
-      robot.printf("\n");
+      kodama.printf("\n");
       for (i = 0; i < RGB_SENSORS_COUNT; i++)
-        robot.printf("%i ", rgb_result->g_normalised[i]);
+        kodama.printf("%i ", rgb_result->g_normalised[i]);
 
-      robot.printf("\n");
+      kodama.printf("\n");
       for (i = 0; i < RGB_SENSORS_COUNT; i++)
-        robot.printf("%i ", rgb_result->b_normalised[i]);
+        kodama.printf("%i ", rgb_result->b_normalised[i]);
 
 
-      robot.gpio_off(LED_0);
+      kodama.gpio_off(LED_0);
 
     }
   }
@@ -132,50 +125,29 @@ void print_thread()
 
 void usr_main()
 {
-
   sytem_clock_init();
   lib_os_init();
 
-  int32_t i, res;
+  if (kodama.init() != 0)
+    kodama.error_func();
 
-
-  for (i = 0; i < 8; i++)
-  {
-    res = robot.init();
-
-    robot.printf("kodama init %i %i : ", i, res);
-
-    if (res == 0)
-    {
-      robot.printf(" [OK]\n");
-      break;
-    }
-    else
-      robot.printf(" [FAILED]\n");
-  }
-
-  if (res != 0)
-    robot.error();
-
-  robot.sleep();
 
   while (1)
   {
-    if (robot.gpio_in(KEY) != 0)
+    if (kodama.gpio_in(KEY) != 0)
     {
-      robot.wakeup();
-
       create_thread(sensor_thread, sensor_thread_stack, sizeof(sensor_thread_stack), PRIORITY_MAX);
-      create_thread(ai_thread, ai_thread_stack, sizeof(ai_thread_stack), PRIORITY_MAX);
       create_thread(print_thread, print_thread_stack, sizeof(print_thread_stack), PRIORITY_MAX);
       break;
     }
 
-    robot.gpio_on(LED_0);
-    robot.delay_ms(10);
+    kodama.gpio_on(LED_0);
+    kodama.delay_ms(10);
 
-    robot.gpio_off(LED_0);
-    robot.delay_ms(300);
+    kodama.gpio_off(LED_0);
+    kodama.delay_ms(300);
+
+    kodama.printf("idle %u\n", kodama.get_time());
   }
 
   kernel_start();

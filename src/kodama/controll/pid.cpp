@@ -8,7 +8,7 @@ CPID::CPID(float kp, float ki, float kd, float output_range)
 CPID::~CPID()
 {
 
-}
+} 
 
 void CPID::init(float kp, float ki, float kd, float output_range)
 {
@@ -32,11 +32,11 @@ float CPID::process(float error)
   e1 = e0;
   e0 = error;
 
-
   u+= k0*e0 + k1*e1 + k2*e2;
 
   if (u > output_range)
     u = output_range;
+
   if (u < -output_range)
     u = -output_range;
 

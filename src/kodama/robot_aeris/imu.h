@@ -5,6 +5,8 @@
 
 struct sIMUSensor
 {
+  int32_t roll_, pitch_, yaw_;  //raw values from gyro
+
   int32_t roll, pitch, yaw;
 	int32_t ax, ay, az;
 };

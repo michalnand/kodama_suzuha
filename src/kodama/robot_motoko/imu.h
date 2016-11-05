@@ -9,7 +9,7 @@ struct sIMUSensor
 	int32_t ax, ay, az;
 };
 
-class CIMU: public CI2C
+class CIMU
 {
   private:
     int32_t gx_ofs, gy_ofs, gz_ofs;
@@ -29,7 +29,7 @@ class CIMU: public CI2C
     int32_t imu_init();
     void imu_read();
 
-    struct sIMUSensor* imu_get();
+    struct sIMUSensor* get_imu_result();
 };
 
 #endif

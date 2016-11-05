@@ -8,6 +8,7 @@ SRCS+= $(shell find suzuha/ -name '*.c')
 
 CXX_SRCS = kodama/kodama.cpp
 CXX_SRCS+= $(shell find kodama/robot_motoko/ -name '*.cpp')
+CXX_SRCS+= $(shell find kodama/controll/ -name '*.cpp')
 CXX_SRCS+= $(shell find usr/ -name '*.cpp')
 
 
