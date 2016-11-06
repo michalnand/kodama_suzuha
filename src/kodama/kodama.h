@@ -18,6 +18,8 @@
 #include <controll/math.h>
 #include <controll/pid.h>
 
+#include <controll/associative_memory.h>
+
 
 #ifndef NULL
 #define NULL  0
@@ -26,6 +28,7 @@
 class CKodama: public CGPIO, public CError, public CTerminal, public CTimer, public CSensors, public CMotor
 {
   private:
+    int32_t ms_dt;
     uint32_t motor_value[MOTORS_COUNT];
 
   public:
@@ -34,6 +37,8 @@ class CKodama: public CGPIO, public CError, public CTerminal, public CTimer, pub
 
     int32_t init();
     int32_t init_();
+
+    void set_dt(int32_t ms_dt_);
 
 
     int32_t sensor_get(uint32_t sensor_id);

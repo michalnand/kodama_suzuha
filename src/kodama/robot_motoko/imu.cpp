@@ -1,7 +1,7 @@
 #include "imu.h"
 #include "lsm9ds0_regs.h"
 #include "i2c.h"
-
+#include "../controll/math.h"
 
 CIMU::CIMU()
 {
@@ -17,9 +17,15 @@ int32_t CIMU::imu_init()
 {
   uint8_t tmp;
 
+  imu_ms_dt = 10;
+
   gx_ofs = 0;
   gy_ofs = 0;
   gz_ofs = 0;
+
+  roll = 0;
+  pitch = 0;
+  yaw = 0;
 
 
   uint32_t loops = 10000;
@@ -58,6 +64,9 @@ int32_t CIMU::imu_init()
   //2g full range
   i2c.write_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_CTRL_REG2_XM, 0);
 
+
+
+/*
   //magnetometer init
   // enable temperature sensor, high resolution, 100Hz outout rate
   i2c.write_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_CTRL_REG5_XM, (1<<7)|(1<<6)|(1<<5)|(1<<4)|(1<<2));
@@ -67,7 +76,7 @@ int32_t CIMU::imu_init()
 
   //continuous normal mode
   i2c.write_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_CTRL_REG7_XM, 1<<7);
-
+*/
 
   loops = 100000;
   while (loops--)
@@ -89,28 +98,23 @@ int32_t CIMU::imu_init()
         __asm("nop");
 
       imu_read();
-      gx_ofs_sum+= gx;
-      gy_ofs_sum+= gy;
-      gz_ofs_sum+= gz;
+      gx_ofs_sum+= imu_result.gx;
+      gy_ofs_sum+= imu_result.gy;
+      gz_ofs_sum+= imu_result.gz;
   }
 
   gx_ofs = gx_ofs_sum / (int32_t)measurments;
   gy_ofs = gy_ofs_sum / (int32_t)measurments;
   gz_ofs = gz_ofs_sum / (int32_t)measurments;
 
-  ax = 0;
-  ay = 0;
-  az = 0;
+  imu_result.ax = 0;
+  imu_result.ay = 0;
+  imu_result.az = 0;
 
-  mx = 0;
-  my = 0;
-  mz = 0;
+  imu_result.gx = 0;
+  imu_result.gy = 0;
+  imu_result.gz = 0;
 
-  gx = 0;
-  gy = 0;
-  gz = 0;
-
-  temperature = 0;
 
   imu_result.roll = 0;
   imu_result.pitch = 0;
@@ -122,83 +126,60 @@ int32_t CIMU::imu_init()
 
 void CIMU::imu_read()
 {
-  uint16_t tmp;
-
-/*
-  i2cStart();
-  i2cWrite(LSM9DS0_GYRO_ADDRESS);  // slave address, write command
-  i2cWrite(LSM9DS0_OUT_X_L_G);  // send reg address
-
-  i2cStart();
-  i2cWrite(LSM9DS0_GYRO_ADDRESS|0x01); // slave address, read command
-
-  tmp = (uint16_t)i2cRead(1);   //read data
-  tmp|= ((uint16_t)i2cRead(1))<<8;   //read data
-  gx = tmp;
-
-  tmp = (uint16_t)i2cRead(1);   //read data
-  tmp|= ((uint16_t)i2cRead(1))<<8;   //read data
-  gy = tmp;
-
-  tmp = (uint16_t)i2cRead(1);   //read data
-  tmp|= ((uint16_t)i2cRead(0))<<8;   //read data
-  gz = tmp;
-
-  i2cStop();
-*/
-
-  tmp = ((uint16_t)i2c.read_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_OUT_X_L_G));
-  tmp|= ((uint16_t)i2c.read_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_OUT_X_H_G))<<8;
-  gx = tmp;
-
-	tmp = ((uint16_t)i2c.read_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_OUT_Y_L_G));
-	tmp|= ((uint16_t)i2c.read_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_OUT_Y_H_G))<<8;
-	gy = tmp;
-
-	tmp = ((uint16_t)i2c.read_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_OUT_Z_L_G));
-	tmp|= ((uint16_t)i2c.read_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_OUT_Z_H_G))<<8;
-	gz = tmp;
-
-	//read magnetometer
-	tmp = ((uint16_t)i2c.read_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_OUT_X_L_M));
-	tmp|= ((uint16_t)i2c.read_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_OUT_X_H_M))<<8;
-	mx = tmp;
-
-	tmp = ((uint16_t)i2c.read_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_OUT_Y_L_M));
-	tmp|= ((uint16_t)i2c.read_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_OUT_Y_H_M))<<8;
-	my = tmp;
-
-	tmp = ((uint16_t)i2c.read_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_OUT_Z_L_M));
-	tmp|= ((uint16_t)i2c.read_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_OUT_Z_H_M))<<8;
-	mz = tmp;
+  int16_t tmp;
 
 
-	//read accelerometer
-	tmp = ((uint16_t)i2c.read_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_OUT_X_L_A));
-	tmp|= ((uint16_t)i2c.read_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_OUT_X_H_A))<<8;
-	ax = tmp;
+  i2c.Start();
+  i2c.Write(LSM9DS0_GYRO_ADDRESS);  // slave address, write command
+  i2c.Write(LSM9DS0_OUT_X_L_G|0x80);  // send reg address, auto increment address
 
-	tmp = ((uint16_t)i2c.read_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_OUT_Y_L_A));
-	tmp|= ((uint16_t)i2c.read_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_OUT_Y_H_A))<<8;
-	ay = tmp;
+  i2c.Start();
+  i2c.Write(LSM9DS0_GYRO_ADDRESS|0x01); // slave address, read command
 
-	tmp = ((uint16_t)i2c.read_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_OUT_Z_L_A));
-	tmp|= ((uint16_t)i2c.read_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_OUT_Z_H_A))<<8;
-	az = tmp;
+  tmp = (uint16_t)i2c.Read(1);   //read data
+  tmp|= ((uint16_t)i2c.Read(1))<<8;   //read data
+  imu_result.gx = tmp;
+
+  tmp = (uint16_t)i2c.Read(1);   //read data
+  tmp|= ((uint16_t)i2c.Read(1))<<8;   //read data
+  imu_result.gy = tmp;
+
+  tmp = (uint16_t)i2c.Read(1);   //read data
+  tmp|= ((uint16_t)i2c.Read(0))<<8;   //read data
+  imu_result.gz = tmp;
+
+  i2c.Stop();
 
 
-	//read temperature
-	tmp = ((uint16_t)i2c.read_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_OUT_TEMP_L_XM));
-	tmp|= ((uint16_t)i2c.read_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_OUT_TEMP_H_XM))<<8;
-	temperature = tmp;
+  i2c.Start();
+  i2c.Write(LSM9DS0_ACC_MAG_ADDRESS);  // slave address, write command
+  i2c.Write(LSM9DS0_OUT_X_L_A|0x80);  // send reg address, auto increment address
 
+  i2c.Start();
+  i2c.Write(LSM9DS0_ACC_MAG_ADDRESS|0x01); // slave address, read command
 
-  imu_result.roll = imu_result.roll + ((int32_t)gx - gx_ofs)/(int32_t)200;
-  imu_result.pitch = imu_result.pitch + ((int32_t)gy - gy_ofs)/(int32_t)200;
-  imu_result.yaw = imu_result.yaw + ((int32_t)gz - gz_ofs)/(int32_t)200;
-  imu_result.ax = ax;
-  imu_result.ay = ay;
-  imu_result.az = az;
+  tmp = (uint16_t)i2c.Read(1);   //read data
+  tmp|= ((uint16_t)i2c.Read(1))<<8;   //read data
+  imu_result.ax = tmp;
+
+  tmp = (uint16_t)i2c.Read(1);   //read data
+  tmp|= ((uint16_t)i2c.Read(1))<<8;   //read data
+  imu_result.ay = tmp;
+
+  tmp = (uint16_t)i2c.Read(1);   //read data
+  tmp|= ((uint16_t)i2c.Read(0))<<8;   //read data
+  imu_result.az = tmp;
+
+  i2c.Stop();
+
+  roll+= -((int32_t)imu_result.gy - gy_ofs)/(int32_t)200;
+  imu_result.roll = (imu_ms_dt*100*roll)/2530;
+
+  pitch+= -((int32_t)imu_result.gx - gx_ofs)/(int32_t)200;
+  imu_result.pitch = (imu_ms_dt*100*pitch)/2530;
+
+  yaw+= -((int32_t)imu_result.gz - gz_ofs)/(int32_t)200;
+  imu_result.yaw = (imu_ms_dt*100*yaw)/2530;
 }
 
 struct sIMUSensor* CIMU::get_imu_result()

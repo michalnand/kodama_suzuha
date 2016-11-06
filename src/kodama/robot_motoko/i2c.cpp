@@ -115,12 +115,29 @@ uint8_t CI2C::Read(uint8_t  ack)
     }
 
 
+  	if(ack)
+  	{
+      SetLowSDA();
+  	}
+  	else
+  	{
+      SetHighSDA();
+  	}
+
+    SetHighSCL();
+    SetLowSCL();
+
+    SetHighSDA();
+
+/*
    if (ack > 0)
    {
      //0
       SetLowSDA();
       SetHighSCL();
       SetLowSCL();
+    //  SetHighSDA();
+
    }
    else
    {
@@ -128,9 +145,9 @@ uint8_t CI2C::Read(uint8_t  ack)
      SetHighSDA();
      SetHighSCL();
      SetLowSCL();
-     SetLowSDA();
+  //   SetLowSDA();
    }
-
+*/
   return (c);
 }
 
@@ -164,14 +181,14 @@ uint8_t CI2C::read_reg(uint8_t dev_adr, uint8_t reg_adr)
 
 void CI2C::delay()
 {
-  uint8_t loops = 4;
+  uint32_t loops = 10;
   while (loops--)
       __asm("nop");
 }
 
 void CI2C::SetLowSDA()
 {
-
+    //TODO rewrite without GPIO_InitTypeDef
     GPIO_InitTypeDef GPIO_InitStruct;
 
     GPIO_InitStruct.GPIO_Pin = (1<<SDA);
@@ -195,7 +212,7 @@ void CI2C::SetLowSDA()
 
 void CI2C::SetHighSDA()
 {
-/*
+  /*
     GPIO_InitTypeDef GPIO_InitStruct;
 
     GPIO_InitStruct.GPIO_Pin = (1<<SDA);
@@ -208,7 +225,6 @@ void CI2C::SetHighSDA()
 
     I2C_GPIO->MODER  &= ~(GPIO_MODER_MODER0 << (SDA * 2));
     I2C_GPIO->MODER |= (((uint32_t)GPIO_Mode_IN) << (SDA * 2));
-
 
     I2C_GPIO->BSRR = (1<<SDA);
 

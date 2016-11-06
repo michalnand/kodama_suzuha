@@ -7,6 +7,9 @@
 //extern class CMath math;
 //math.method(param)
 
+
+#define PI      ((float)3.141592654)
+
 class CMath
 {
   public:
@@ -21,6 +24,11 @@ class CMath
 
     //map value x from interval <source_min, source_max> to <dest_min, dest_max> using linear transformation
     float map(float x, float source_min, float source_max, float dest_min = -1.0, float dest_max = 1.0);
+
+    //TODO
+    float atan(float x);
+    float atan2(float y, float x);
+
 };
 
 extern CMath math;

@@ -6,6 +6,7 @@
 struct sIMUSensor
 {
   int32_t roll, pitch, yaw;
+  int32_t gx, gy, gz;
 	int32_t ax, ay, az;
 };
 
@@ -13,14 +14,12 @@ class CIMU
 {
   private:
     int32_t gx_ofs, gy_ofs, gz_ofs;
-
-    int16_t ax, ay, az;
-    int16_t mx, my, mz;
-    int16_t gx, gy, gz;
-
-    int16_t temperature;
+    int32_t roll, pitch, yaw;
 
     struct sIMUSensor imu_result;
+
+  protected:
+    int32_t imu_ms_dt;
 
   public:
     CIMU();

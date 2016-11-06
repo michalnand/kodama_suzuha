@@ -66,6 +66,12 @@ int32_t CKodama::init_()
 }
 
 
+void CKodama::set_dt(int32_t ms_dt_)
+{
+  this->ms_dt = ms_dt_;
+  imu_ms_dt = this->ms_dt;
+}
+
 
 int32_t CKodama::sensor_get(uint32_t sensor_id)
 {
@@ -93,47 +99,53 @@ int32_t CKodama::comm_send( unsigned char *tx_buffer, uint32_t tx_buffer_length,
 
 void CKodama::rotate_robot(int32_t angle, int32_t speed, int32_t (*terminating_func)())
 {
+  event_timer_set_period(0, this->ms_dt);
+
+  imu_read();
+
   int32_t required_angle = angle + get_imu_result()->yaw;
   int32_t dif_speed = 0;
 
   int32_t tmp, error;
 
-
-  do
+  while (1)
   {
-    if (terminating_func != NULL)
-      if (terminating_func() != 0)    //terminating func returns non zero - terminate action
+    uint32_t res = event_timer_check(0);
+
+    if (res != 0)
+    {
+      if (terminating_func != NULL)
+        if (terminating_func() != 0)    //terminating func returns non zero - terminate action
+          break;
+
+      imu_read();
+      error = required_angle - get_imu_result()->yaw;
+
+      int32_t sgn;
+
+      if (error > 0)
+        sgn = 1;
+      else
+        sgn = -1;
+
+      if (dif_speed < speed)
+        dif_speed++;
+
+      set_motor(MOTOR_LEFT, dif_speed*sgn);
+      set_motor(MOTOR_RIGHT, -dif_speed*sgn);
+
+      tmp = error;
+      if (tmp < 0)
+        tmp = -tmp;
+
+      if (tmp < 50)
         break;
-
-    error = required_angle - get_imu_result()->yaw;
-
-    int32_t sgn;
-
-    if (error > 0)
-      sgn = 1;
-    else
-      sgn = -1;
-
-    if (dif_speed < speed)
-      dif_speed++;
-
-    set_motor(MOTOR_LEFT, dif_speed*sgn);
-    set_motor(MOTOR_RIGHT, -dif_speed*sgn);
-
-    delay_ms(20);
-
-    tmp = error;
-    if (tmp < 0)
-      tmp = -tmp;
+    }
   }
-  while (tmp > 50);
-
 
   set_motor(MOTOR_LEFT, 0);
   set_motor(MOTOR_RIGHT, 0);
-
   delay_ms(20);
-
 }
 
 
