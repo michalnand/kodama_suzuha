@@ -39,10 +39,12 @@ int32_t CMotor::motor_init()
   return 0;
 }
 
-void CMotor::motor_set(uint32_t motor_id, int32_t value)
+void CMotor::set_motor(uint32_t motor_id, int32_t value)
 {
   if (motor_id < MOTORS_COUNT)
     motors[motor_id] = value;
+
+  motor_refresh();
 }
 
 

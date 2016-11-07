@@ -28,5 +28,4 @@ class CGPIO
     int32_t get_encoder_distance();
 };
 
-
 #endif

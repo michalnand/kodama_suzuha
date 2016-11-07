@@ -25,9 +25,10 @@ class CMotor
     void motor_sleep();
 
 
-    void motor_set(uint32_t  motor_id, int32_t value);
+    void set_motor(uint32_t  motor_id, int32_t value);
 
     void motor_refresh();
+
 };
 
 #endif

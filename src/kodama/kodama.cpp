@@ -69,7 +69,7 @@ int32_t CKodama::init_()
 void CKodama::set_dt(int32_t ms_dt_)
 {
   this->ms_dt = ms_dt_;
-  imu_ms_dt = this->ms_dt;
+  imu_ms_dt = 10;
 }
 
 
@@ -151,33 +151,47 @@ void CKodama::rotate_robot(int32_t angle, int32_t speed, int32_t (*terminating_f
 
 void CKodama::go_forward(int32_t distance, int32_t speed, int32_t (*terminating_func)())
 {
-  int32_t required_angle = get_imu_result()->yaw;
-
-  int32_t speed_ = 0;
-  int32_t distance_ = 0;
-
-
   class CPID pid( PID_FORWARD_KP,
                   PID_FORWARD_KI,
                   PID_FORWARD_KD,
                   PID_FORWARD_U);
 
-  do
+
+
+  event_timer_set_period(0, this->ms_dt);
+
+  imu_read();
+
+  int32_t required_angle = 0 + get_imu_result()->yaw;
+  int32_t distance_end = get_encoder_distance() + distance;
+
+  int32_t speed_ = 0;
+
+
+
+  while (1)
   {
-    if (terminating_func != NULL)
-      if (terminating_func() != 0)    //terminating func returns non zero - terminate action
+    uint32_t res = event_timer_check(0);
+    if (res != 0)
+    {
+      if (terminating_func != NULL)
+        if (terminating_func() != 0)    //terminating func returns non zero - terminate action
+          break;
+
+      if (distance_end < get_encoder_distance())
         break;
 
-    int32_t dif_speed = (int32_t)pid.process(1.0*required_angle - 1.0*get_imu_result()->yaw);
-    if (speed_ < speed)
-      speed_++;
+      imu_read();
 
-    set_motor(MOTOR_LEFT, dif_speed + speed_);
-    set_motor(MOTOR_RIGHT, -dif_speed + speed_);
+      int32_t dif_speed = (int32_t)pid.process(required_angle - get_imu_result()->yaw);
 
-    delay_ms(20);
+      if (speed_ < speed)
+        speed_++;
+
+      set_motor(MOTOR_LEFT, dif_speed + speed_);
+      set_motor(MOTOR_RIGHT, -dif_speed + speed_);
+    }
   }
-    while (distance > distance_);
 
 
   set_motor(MOTOR_LEFT, 0);

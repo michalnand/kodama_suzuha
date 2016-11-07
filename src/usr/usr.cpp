@@ -95,9 +95,9 @@ void print_debug()
 void robot_run()
 {
 
-  /*
   kodama.event_timer_set_period(0, SENSOR_SAMPLING_PERIOD);
 
+/*
   uint32_t cnt = 0;
   while (1)
   {
@@ -115,14 +115,25 @@ void robot_run()
         print_debug();
     }
   }
-  */
+*/
 
-  kodama.rotate_robot(1800, SPEED_MAX/2, NULL);
-  kodama.rotate_robot(-1800, SPEED_MAX/2, NULL);
+/*
+  kodama.rotate_robot(900, SPEED_MAX/2, NULL);
+  kodama.rotate_robot(900, SPEED_MAX/2, NULL);
+  kodama.rotate_robot(900, SPEED_MAX/2, NULL);
+  kodama.rotate_robot(900, SPEED_MAX/2, NULL);
+
+  kodama.rotate_robot(-900, SPEED_MAX/2, NULL);
+  kodama.rotate_robot(-900, SPEED_MAX/2, NULL);
+  kodama.rotate_robot(-900, SPEED_MAX/2, NULL);
+  kodama.rotate_robot(-900, SPEED_MAX/2, NULL);
+
 
   kodama.rotate_robot(-450, SPEED_MAX, NULL);
   kodama.rotate_robot(450, SPEED_MAX, NULL);
+*/
 
+  kodama.go_forward(8000, SPEED_MAX/2, NULL);
 
   while (1)
   {

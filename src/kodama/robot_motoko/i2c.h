@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-
 #define RCC_AHBPeriph_GPIO_I2C RCC_AHBPeriph_GPIOB
 #define I2C_GPIO    GPIOB
 

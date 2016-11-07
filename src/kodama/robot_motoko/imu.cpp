@@ -175,6 +175,8 @@ void CIMU::imu_read()
   roll+= -((int32_t)imu_result.gy - gy_ofs)/(int32_t)200;
   imu_result.roll = (imu_ms_dt*100*roll)/2530;
 
+//  imu_result.roll = 3600.0*math.atan2(1.0*imu_result.az, 1.0*imu_result.ax)/(2.0*PI);
+
   pitch+= -((int32_t)imu_result.gx - gx_ofs)/(int32_t)200;
   imu_result.pitch = (imu_ms_dt*100*pitch)/2530;
 
