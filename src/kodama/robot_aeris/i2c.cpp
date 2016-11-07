@@ -1,8 +1,19 @@
 #include "i2c.h"
 #include <device.h>
 
+CI2C i2c;
 
-void i2c_init()
+CI2C::CI2C()
+{
+
+}
+
+CI2C::~CI2C()
+{
+
+}
+
+void CI2C::init()
 {
     RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIO_I2C, ENABLE);
 
@@ -22,7 +33,7 @@ void i2c_init()
 
 
 
-void i2cStart()
+void CI2C::Start()
 {
     SetHighSCL();
     SetHighSDA();
@@ -35,7 +46,7 @@ void i2cStart()
 }
 
 
-void i2cStop()
+void CI2C::Stop()
 {
     SetLowSCL();
     SetLowSDA();
@@ -49,7 +60,7 @@ void i2cStop()
 
 
 
-int i2cWrite(uint8_t a)
+int CI2C::Write(uint8_t a)
 {
     uint8_t  i;
     uint8_t  return_ack;
@@ -79,13 +90,13 @@ int i2cWrite(uint8_t a)
 
     SetLowSCL();
 
-    i2c_delay();
+    delay();
 
     return(return_ack);
 }
 
 
-uint8_t i2cRead(uint8_t  ack)
+uint8_t CI2C::Read(uint8_t  ack)
 {
     uint8_t  i;
     uint8_t  c = 0x00;
@@ -104,12 +115,29 @@ uint8_t i2cRead(uint8_t  ack)
     }
 
 
+  	if(ack)
+  	{
+      SetLowSDA();
+  	}
+  	else
+  	{
+      SetHighSDA();
+  	}
+
+    SetHighSCL();
+    SetLowSCL();
+
+    SetHighSDA();
+
+/*
    if (ack > 0)
    {
      //0
       SetLowSDA();
       SetHighSCL();
       SetLowSCL();
+    //  SetHighSDA();
+
    }
    else
    {
@@ -117,51 +145,50 @@ uint8_t i2cRead(uint8_t  ack)
      SetHighSDA();
      SetHighSCL();
      SetLowSCL();
-     SetLowSDA();
+  //   SetLowSDA();
    }
-
-
-    return (c);
+*/
+  return (c);
 }
 
 
-void i2c_write_reg(uint8_t dev_adr, uint8_t reg_adr, uint8_t value)
+void CI2C::write_reg(uint8_t dev_adr, uint8_t reg_adr, uint8_t value)
 {
-    i2cStart();
-    i2cWrite(dev_adr);  /*slave address, write command*/
-    i2cWrite(reg_adr);  /*send reg address*/
-    i2cWrite(value);
-    i2cStop();
+    Start();
+    Write(dev_adr);  /*slave address, write command*/
+    Write(reg_adr);  /*send reg address*/
+    Write(value);
+    Stop();
 }
 
-uint8_t i2c_read_reg(uint8_t dev_adr, uint8_t reg_adr)
+uint8_t CI2C::read_reg(uint8_t dev_adr, uint8_t reg_adr)
 {
     uint8_t res;
 
-    i2cStart();
-    i2cWrite(dev_adr);  /*slave address, write command*/
-    i2cWrite(reg_adr);  /*send reg address*/
+    Start();
+    Write(dev_adr);  /*slave address, write command*/
+    Write(reg_adr);  /*send reg address*/
 
-    i2cStart();
-    i2cWrite(dev_adr|0x01); /*slave address, read command*/
-    res = i2cRead(0);   /*read data*/
-    i2cStop();
+    Start();
+    Write(dev_adr|0x01); /*slave address, read command*/
+    res = Read(0);   /*read data*/
+    Stop();
 
     return res;
 }
 
 
 
-void i2c_delay()
+void CI2C::delay()
 {
-  uint8_t loops = 4;
+  uint32_t loops = 10;
   while (loops--)
       __asm("nop");
 }
 
-void SetLowSDA()
+void CI2C::SetLowSDA()
 {
-
+    //TODO rewrite without GPIO_InitTypeDef
     GPIO_InitTypeDef GPIO_InitStruct;
 
     GPIO_InitStruct.GPIO_Pin = (1<<SDA);
@@ -180,12 +207,12 @@ void SetLowSDA()
     */
     I2C_GPIO->BRR = (1<<SDA);
 
-    i2c_delay();
+    delay();
 }
 
-void SetHighSDA()
+void CI2C::SetHighSDA()
 {
-/*
+  /*
     GPIO_InitTypeDef GPIO_InitStruct;
 
     GPIO_InitStruct.GPIO_Pin = (1<<SDA);
@@ -199,20 +226,19 @@ void SetHighSDA()
     I2C_GPIO->MODER  &= ~(GPIO_MODER_MODER0 << (SDA * 2));
     I2C_GPIO->MODER |= (((uint32_t)GPIO_Mode_IN) << (SDA * 2));
 
-
     I2C_GPIO->BSRR = (1<<SDA);
 
-    i2c_delay();
-} 
-
-void SetLowSCL()
-{
-    I2C_GPIO->BRR = (1<<SCL);
-    i2c_delay();
+    delay();
 }
 
-void SetHighSCL()
+void CI2C::SetLowSCL()
+{
+    I2C_GPIO->BRR = (1<<SCL);
+    delay();
+}
+
+void CI2C::SetHighSCL()
 {
     I2C_GPIO->BSRR = (1<<SCL);
-    i2c_delay();
+    delay();
 }

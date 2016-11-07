@@ -5,9 +5,9 @@
 
 #define GPIO_BASE	GPIOB
 
-#define LED_0		(1)    //main led
-#define LED_1		(2)    //white led for sensors ilumination
-#define KEY 		(3)    //main button
+#define LED_0		(15)    //main led, PB15
+#define LED_1		(3)    //white led for sensors ilumination, PA3
+#define KEY 		(9)    //main button, PB9
 
 #define ENCODER_CONSTANT ((u32)750) //670
 

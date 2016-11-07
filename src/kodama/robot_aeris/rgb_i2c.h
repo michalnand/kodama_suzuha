@@ -3,15 +3,22 @@
 
 
 /*this on GPIOA*/
+#define RGB_SENSORS_COUNT		(4)
+
+/*this on GPIOA*/
 #define RGB_SDA_0     	4
 #define RGB_SDA_1     	5
 #define RGB_SDA_2     	6
 #define RGB_SDA_3     	7
 
-#define RGB_SENSORS_COUNT 4
 
 /*this on GPIOC*/
-#define RGB_SCL     		13
+#define RGB_SCL     	  13
+
+
+
+
+
 
 /*APDS-9950 RGB sensor*/
 #define RGB_ADDRESS		(0x39<<1)
@@ -61,6 +68,9 @@
 
 class CRGB_I2C
 {
+  protected:
+    unsigned int rgb_read_all;
+
   public:
 
     CRGB_I2C();
@@ -75,6 +85,9 @@ class CRGB_I2C
 
     void rgb_i2c_write_reg(unsigned char dev_adr, unsigned char reg_adr, unsigned char value);
     void rgb_i2c_read_reg(unsigned char dev_adr, unsigned char reg_adr, unsigned char *res);
+
+    void rgb_i2c_enable_only_proximity();
+    void rgb_i2c_enable_all();
 
   private:
 

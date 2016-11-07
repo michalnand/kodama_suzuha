@@ -1,5 +1,5 @@
-#ifndef _TEMRINAL_H_
-#define _TEMRINAL_H_
+#ifndef _TERMINAL_H_
+#define _TERMINAL_H_
 
 
 #include <stdint.h>

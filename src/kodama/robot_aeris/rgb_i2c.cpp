@@ -1,12 +1,12 @@
 #include "rgb_i2c.h"
 #include <device.h>
 
-#define RGB_I2C_DELAY_LOOPS 1
+#define RGB_I2C_DELAY_LOOPS 4
 
 
 CRGB_I2C::CRGB_I2C()
 {
-	rgb_i2c_init();
+
 }
 
 CRGB_I2C::~CRGB_I2C()
@@ -18,6 +18,8 @@ CRGB_I2C::~CRGB_I2C()
 
 void CRGB_I2C::rgb_i2c_init()
 {
+	rgb_i2c_enable_all();
+
 	GPIO_InitTypeDef GPIO_InitStruct;
 
 	GPIO_InitStruct.GPIO_Pin = (1<<RGB_SCL);
@@ -36,7 +38,8 @@ void CRGB_I2C::rgb_i2c_init()
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL; // this disables resistor
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-	GPIO_SetBits(GPIOA, (1<<RGB_SDA_0)|(1<<RGB_SDA_1)|(1<<RGB_SDA_2)|(1<<RGB_SDA_3) );
+	GPIO_SetBits(GPIOA, (1<<RGB_SDA_0)|(1<<RGB_SDA_1)|(1<<RGB_SDA_2)|(1<<RGB_SDA_3));
+
 
 	RGBSetHighSCL();
 	RGBSetLowSDA();
@@ -119,16 +122,16 @@ void CRGB_I2C::rgb_i2cRead(unsigned char ack, unsigned char *result)
 		unsigned int tmp = GPIOA->IDR;
 
 		if (tmp&(1<<RGB_SDA_0))
-			result[0]|= 1;
+				result[0]|= 1;
 
 		if (tmp&(1<<RGB_SDA_1))
-			result[1]|= 1;
+				result[1]|= 1;
 
 		if (tmp&(1<<RGB_SDA_2))
-			result[2]|= 1;
+				result[2]|= 1;
 
 		if (tmp&(1<<RGB_SDA_3))
-			result[3]|= 1;
+				result[3]|= 1;
 
 		RGBSetLowSCL();
 	}
@@ -180,16 +183,14 @@ void CRGB_I2C::RGBSetLowSDA()
 {
 	GPIO_InitTypeDef GPIO_InitStruct;
 
-	GPIO_InitStruct.GPIO_Pin = (1<<RGB_SDA_0)|(1<<RGB_SDA_1)|(1<<RGB_SDA_2)|(1<<RGB_SDA_3);
-
+	GPIO_InitStruct.GPIO_Pin = rgb_read_all&((1<<RGB_SDA_0)|(1<<RGB_SDA_1)|(1<<RGB_SDA_2)|(1<<RGB_SDA_3));
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;//this sets the GPIO modules clock speed
 	GPIO_InitStruct.GPIO_OType = GPIO_OType_OD; // this sets the pin type to open drain
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL; // this disables resistor
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-	GPIOA->BRR = (1<<RGB_SDA_0)|(1<<RGB_SDA_1)|(1<<RGB_SDA_2)|(1<<RGB_SDA_3);
-
+	GPIOA->BRR = rgb_read_all&((1<<RGB_SDA_0)|(1<<RGB_SDA_1)|(1<<RGB_SDA_2)|(1<<RGB_SDA_3));
 
 	rgb_i2c_delay();
 }
@@ -198,15 +199,14 @@ void CRGB_I2C::RGBSetHighSDA()
 {
 	GPIO_InitTypeDef GPIO_InitStruct;
 
-	GPIO_InitStruct.GPIO_Pin = (1<<RGB_SDA_0)|(1<<RGB_SDA_1)|(1<<RGB_SDA_2)|(1<<RGB_SDA_3);
+	GPIO_InitStruct.GPIO_Pin = rgb_read_all&((1<<RGB_SDA_0)|(1<<RGB_SDA_1)|(1<<RGB_SDA_2)|(1<<RGB_SDA_3));
 
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;//this sets the GPIO modules clock speed
-	//GPIO_InitStruct.GPIO_OType = GPIO_OType_OD; // this sets the pin type to open drain
 	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL; // this disables resistor
 	GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-	GPIOA->BSRR = (1<<RGB_SDA_0)|(1<<RGB_SDA_1)|(1<<RGB_SDA_2)|(1<<RGB_SDA_3);
+	GPIOA->BSRR = rgb_read_all&((1<<RGB_SDA_0)|(1<<RGB_SDA_1)|(1<<RGB_SDA_2)|(1<<RGB_SDA_3));
 
 	rgb_i2c_delay();
 }
@@ -221,4 +221,14 @@ void CRGB_I2C::RGBSetHighSCL()
 {
 	GPIOC->BSRR = 1<<RGB_SCL;
 	rgb_i2c_delay();
+}
+
+void CRGB_I2C::rgb_i2c_enable_only_proximity()
+{
+	rgb_read_all = 0;
+}
+
+void CRGB_I2C::rgb_i2c_enable_all()
+{
+	rgb_read_all = 0xffffffff;
 }

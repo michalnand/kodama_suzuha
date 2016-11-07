@@ -1,33 +1,20 @@
 #ifndef _SENSORS_H_
 #define _SENSORS_H_
 
-#include "rgb_i2c.h"
+
+#include "i2c.h"
+#include "rgb.h"
+#include "imu.h"
 
 
-struct sRGBResult
+
+class CSensors: public CRGB, public CIMU
 {
-  int16_t r[RGB_SENSORS_COUNT], g[RGB_SENSORS_COUNT], b[RGB_SENSORS_COUNT];
-  int16_t ambient[RGB_SENSORS_COUNT], proximity[RGB_SENSORS_COUNT];
-  int16_t r_normalised[RGB_SENSORS_COUNT], g_normalised[RGB_SENSORS_COUNT], b_normalised[RGB_SENSORS_COUNT];
-};
-
-class CSensors: public CRGB_I2C
-{
-  private:
-    unsigned char rgb_raw[RGB_SENSORS_COUNT];
-    struct sRGBResult rgb_result, rgb_calibration;
-
   public:
     CSensors();
     ~CSensors();
 
     int32_t sensors_init();
-
-    void sensors_sleep();
-
-    void rgb_read(unsigned char calibration = 0);
-
-    struct sRGBResult *get_rgb_result();
 };
 
 #endif
