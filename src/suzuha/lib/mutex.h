@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-typedef volatile u32 mutex_t;
+typedef volatile uint32_t mutex_t;
 
 #define LIB_MUTEX			1
 

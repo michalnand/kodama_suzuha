@@ -18,11 +18,11 @@ class CPID
     //@param ki - integration constant
     //@param kd - derivative constant
     //@param output_range - maximum otput range, limits output into <-output_range, output_range>
-    CPID(float kp, float ki, float kd, float output_range);
+    CPID(float kp, float ki, float kd, float output_range_);
     ~CPID();
 
     //new initialization of parameters see CPID
-    void init(float kp, float ki, float kd, float output_range);
+    void init(float kp, float ki, float kd, float output_range_);
 
     //process one discrete controller step
     //@param error, required_value - meassured_value

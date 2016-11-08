@@ -1,12 +1,12 @@
 #include "messages_f.h"
 
 volatile struct sMsg __msg__[MSG_FIFO_SIZE];
-volatile u32 __msg_names__[THREADS_MAX_COUNT];
+volatile uint32_t __msg_names__[THREADS_MAX_COUNT];
 
 /*lib main init*/
 void messages_init()
 {
-  u32 i;
+  uint32_t i;
   for (i = 0; i < THREADS_MAX_COUNT; i++)
     __msg_names__[i] = MSG_NULL;
 
@@ -20,9 +20,9 @@ void messages_init()
 }
 
 /*register thread for message receiving, use unique symbolic name*/
-void msg_register(u32 name)
+void msg_register(uint32_t name)
 {
-  u32 tid = get_thread_id();
+  uint32_t tid = get_thread_id();
 
   sched_off();
   __msg_names__[tid] = name;
@@ -32,7 +32,7 @@ void msg_register(u32 name)
 /*unregistre thread from message receiving*/
 void msg_unregister()
 {
-  u32 tid = get_thread_id();
+  uint32_t tid = get_thread_id();
 
   sched_off();
   __msg_names__[tid] = MSG_NULL;
@@ -43,9 +43,9 @@ void msg_unregister()
 /*wait for meesage and receive it*/
 void msg_get(struct sMsg *msg)
 {
-  u32 i = 0;
-  u32 tid = get_thread_id();
- 
+  uint32_t i = 0;
+  uint32_t tid = get_thread_id();
+
   while (1)
   {
     sched_off();
@@ -58,7 +58,7 @@ void msg_get(struct sMsg *msg)
       msg->destination = __msg__[i].destination;
       msg->data   = __msg__[i].data;
       msg->size   = __msg__[i].size;
-  
+
       /*fifo item clear - can be used again*/
       __msg__[i].source      = MSG_NULL;
       __msg__[i].destination = MSG_NULL;
@@ -70,23 +70,23 @@ void msg_get(struct sMsg *msg)
     }
 
     sched_on();
-    
+
     i++;
 
     /*new fifo search loop*/
-    if (i >= MSG_FIFO_SIZE)  
+    if (i >= MSG_FIFO_SIZE)
     {
       i = 0;
       yield();     /*switch to next thread*/
-    }  
+    }
   }
 }
 
 
 /*wait until ready and send message*/
-u32 msg_raise(struct sMsg *msg)
+uint32_t msg_raise(struct sMsg *msg)
 {
-  u32 msg_res = MSG_FIFO_FULL;
+  uint32_t msg_res = MSG_FIFO_FULL;
   while (msg_res == MSG_FIFO_FULL)
   {
     msg_res = msg_raise_async(msg); /*try raise new message*/
@@ -94,15 +94,15 @@ u32 msg_raise(struct sMsg *msg)
     if (msg_res != MSG_SUCESS)
       yield();     /*switch to next thread*/
   }
- 
+
   wake_up_threads();		/*wake up threads*/
   return msg_res;
 }
 
 /*no wait and send message*/
-u32 msg_raise_async(struct sMsg *msg)
+uint32_t msg_raise_async(struct sMsg *msg)
 {
-  u32 i;
+  uint32_t i;
 
   sched_off();
 
@@ -123,7 +123,7 @@ u32 msg_raise_async(struct sMsg *msg)
 
   /*find first free item in fifo*/
   for (i = 0; i < MSG_FIFO_SIZE; i++)
-    if (__msg__[i].source == MSG_NULL) 
+    if (__msg__[i].source == MSG_NULL)
     {
       /*update fifo item value with new message*/
       __msg__[i].source = msg->source;
@@ -134,7 +134,7 @@ u32 msg_raise_async(struct sMsg *msg)
       /*sucess return*/
       sched_on();
       wake_up_threads();		/*wake up threads - to receive message*/
-      return MSG_SUCESS;	
+      return MSG_SUCESS;
     }
 
     /*error return, no space to add message*/
@@ -145,11 +145,11 @@ u32 msg_raise_async(struct sMsg *msg)
 }
 
 
-u32 msg_check()
+uint32_t msg_check()
 {
-  u32 tid = get_thread_id();
-  u32 i;
-  u32 res = 0;
+  uint32_t tid = get_thread_id();
+  uint32_t i;
+  uint32_t res = 0;
 
   for (i = 0; i < MSG_FIFO_SIZE; i++)
   {

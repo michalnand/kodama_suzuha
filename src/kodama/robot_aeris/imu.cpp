@@ -172,16 +172,14 @@ void CIMU::imu_read()
 
   i2c.Stop();
 
-  roll+= -((int32_t)imu_result.gy - gy_ofs)/(int32_t)200;
-  imu_result.roll = (imu_ms_dt*100*roll)/2530;
+  roll+= ((int32_t)imu_result.gy - gy_ofs)/(int32_t)200;
+  imu_result.roll = (imu_ms_dt*85*roll)/2530;
 
-//  imu_result.roll = 3600.0*math.atan2(1.0*imu_result.az, 1.0*imu_result.ax)/(2.0*PI);
+  pitch+= ((int32_t)imu_result.gx - gx_ofs)/(int32_t)200;
+  imu_result.pitch = (imu_ms_dt*85*pitch)/2530;
 
-  pitch+= -((int32_t)imu_result.gx - gx_ofs)/(int32_t)200;
-  imu_result.pitch = (imu_ms_dt*100*pitch)/2530;
-
-  yaw+= -((int32_t)imu_result.gz - gz_ofs)/(int32_t)200;
-  imu_result.yaw = (imu_ms_dt*100*yaw)/2530;
+  yaw+= ((int32_t)imu_result.gz - gz_ofs)/(int32_t)200;
+  imu_result.yaw = (imu_ms_dt*85*yaw)/2530;
 }
 
 struct sIMUSensor* CIMU::get_imu_result()

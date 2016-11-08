@@ -9,7 +9,7 @@ struct sRGBResult
   int16_t ambient[RGB_SENSORS_COUNT], proximity[RGB_SENSORS_COUNT];
   int16_t r_normalised[RGB_SENSORS_COUNT], g_normalised[RGB_SENSORS_COUNT], b_normalised[RGB_SENSORS_COUNT];
 };
-
+ 
 class CRGB: public CRGB_I2C
 {
   private:

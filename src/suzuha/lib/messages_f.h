@@ -80,7 +80,7 @@ extern "C" {
 /**
  @brief message item
 
- \* u32 destination, source - symbolic unique 32 bit name for receiver and sender, diferent from MSG_NULL\n
+ \* uint32_t destination, source - symbolic unique 32 bit name for receiver and sender, diferent from MSG_NULL\n
  this name must be know for all communication sides
  \* size - item suze in bytes
  \* data - main message, in simple form 32 bit data, in more complex can be retyped pointer for any structure\n
@@ -88,9 +88,9 @@ extern "C" {
 */
 struct sMsg
 {
-	u32 destination, source;
-	u32 size;
-	u32 data;
+	uint32_t destination, source;
+	uint32_t size;
+	uint32_t data;
 };
 
 /**
@@ -103,9 +103,9 @@ void messages_init();
 /**
  @brief register thread for work with messages
 
- @param u32 name : unique 32 bit name know for all communication parts\n
+ @param uint32_t name : unique 32 bit name know for all communication parts\n
 */
-void msg_register(u32 name);
+void msg_register(uint32_t name);
 
 void msg_unregister();
 
@@ -127,7 +127,7 @@ void msg_get(struct sMsg *msg);
  @return MSG_SUCESS if success, other returning values : MSG_NO_REGISTED, MSG_FIFO_FULL, MSG_ERROR
  @see struct sMsg
 */
-u32 msg_raise(struct sMsg *msg);
+uint32_t msg_raise(struct sMsg *msg);
 
 /**
  @brief send message
@@ -139,13 +139,13 @@ u32 msg_raise(struct sMsg *msg);
  @return MSG_SUCESS if success, other returning values : MSG_NO_REGISTED, MSG_FIFO_FULL, MSG_ERROR
  @see struct sMsg
 */
-u32 msg_raise_async(struct sMsg *msg);
+uint32_t msg_raise_async(struct sMsg *msg);
 
 
 /**
 	@brief return 0 if no message in front, else return !0
 */
-u32 msg_check();
+uint32_t msg_check();
 
 #ifdef __cplusplus
 }

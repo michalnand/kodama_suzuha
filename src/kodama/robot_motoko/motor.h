@@ -24,6 +24,8 @@ class CMotor
 
     void set_motor(uint32_t  motor_id, int32_t value);
 
+    void motor_sleep();
+
   private:
     void motor_refresh();
     void pwm_set(uint32_t ch1, uint32_t ch2);

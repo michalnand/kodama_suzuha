@@ -12,7 +12,7 @@ extern "C" {
 #define NULL  0
 #endif
 
-void* malloc_safe(u32 size);
+void* malloc_safe(uint32_t size);
 void free_safe(void *ptr);
 
 

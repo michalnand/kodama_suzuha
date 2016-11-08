@@ -109,13 +109,13 @@ extern "C" {
 */
 struct sThread
 {
-  u16 cnt, icnt;
-  u32 flag;
-  u32 *sp;
+  uint16_t cnt, icnt;
+  uint32_t flag;
+  uint32_t *sp;
 };
 
 
-typedef u32 thread_stack_t;
+typedef uint32_t thread_stack_t;
 
 /**
  @brief disable interrupts
@@ -144,7 +144,7 @@ void yield();
 
  @return unique thread ID, exactly it is index into \_\_task\_\_ array
 */
-u32 get_thread_id();
+uint32_t get_thread_id();
 
 /**
  @brief main kernel init, call before first thread created (main_thread)
@@ -181,7 +181,7 @@ void kernel_start();
  \* if thread success created, item \_\_task\_\_[TASK_ID] is initialized\n
  execution starts after sys tick interrupt and scheduler choose
 */
-u32 create_thread(void (*thread_ptr)(), thread_stack_t *s_ptr, u32 stack_size, u16 priority);
+uint32_t create_thread(void (*thread_ptr)(), thread_stack_t *s_ptr, uint32_t stack_size, uint16_t priority);
 
 /**
  @brief disable interrupt and enter to infinite loop
@@ -216,9 +216,9 @@ void wake_up_threads_int();
   this ID is returned when create_task(); called\n
 
   @param task_id : unique thread id returned when task_created called
-  @see u32 create_thread(void (*thread_ptr)(), u32 *s_ptr, u32 stack_size, u16 priority)
+  @see uint32_t create_thread(void (*thread_ptr)(), uint32_t *s_ptr, uint32_t stack_size, uint16_t priority)
 */
-void join(u32 thread_id);
+void join(uint32_t thread_id);
 
 
 

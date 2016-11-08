@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-#include "int_def.h"
+#include <stdint.h>
 #include "core/stm32f30x.h"
 #include "core/cortex_cpu.h"
 #include "core/core_cm4_simd.h"

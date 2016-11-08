@@ -6,7 +6,8 @@ class CMath math;
 
 CMath::CMath()
 {
-
+  __rnda__ = 1;
+  __rndb__  = 2;
 }
 
 CMath::~CMath()
@@ -68,4 +69,17 @@ float CMath::atan2(float y, float x )
     res = -PI/2.0;
 
   return res;
+}
+
+unsigned int CMath::rand()
+{
+  __rnda__ = __rnda__ *(unsigned int)1103515245 + (unsigned int)12345;
+	__rndb__ = (__rndb__ >> 1) ^ (-(__rndb__ & 1u) & 0xD0000001u);
+
+	return (__rnda__ ^ __rndb__);
+}
+
+float CMath::rnd()
+{
+  return (rand()%2000000)/1000000.0 - 1.0;
 }

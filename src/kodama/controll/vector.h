@@ -1,7 +1,7 @@
 #ifndef _VECTOR_H_
 #define _VECTOR_H_
 
-template <class t_type, int _size> class Vector
+template <class t_type, unsigned int _size> class Vector
 {
   public:
     t_type arr[_size];
@@ -17,12 +17,12 @@ template <class t_type, int _size> class Vector
 
     }
 
-    t_type &operator[](int idx)
+    t_type &operator[](unsigned int idx)
     {
       return arr[idx];
     }
 
-    int size()
+    unsigned int size()
     {
       return _size;
     }

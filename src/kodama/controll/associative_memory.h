@@ -3,6 +3,7 @@
 
 
 #include "math_vector.h"
+#include "math.h"
 
 template <int input_size, int output_size, int hard_locations_count> class AssociativeMemory
 {
@@ -27,8 +28,19 @@ template <int input_size, int output_size, int hard_locations_count> class Assoc
 
     void init()
     {
-      used_hard_locations = 0;
-      learning_rate = 0.3;
+      used_hard_locations = hard_locations_count/2;
+      learning_rate = 0.1;
+      unsigned int i, j;
+
+      for (j = 0; j < hard_locations_count; j++)
+        for (i = 0; i < input_size; i++)
+        {
+          hard_locations[j][i] = math.rnd();
+        }
+
+      for (j = 0; j < hard_locations_count; j++)
+        for (i = 0; i < output_size; i++)
+          output_values[j][i] = 0.0;
     }
 
     void save(MathVector<input_size> &input, MathVector<output_size> &required_output)
@@ -46,13 +58,13 @@ template <int input_size, int output_size, int hard_locations_count> class Assoc
      if (used_hard_locations < hard_locations.size())
       {
         hard_locations[used_hard_locations].mix(input, 1.0);
-        output_values[used_hard_locations].mix(input, 1.0);
+        output_values[used_hard_locations].mix(required_output, 1.0);
         used_hard_locations++;
       }
       else
       {
         hard_locations[min_idx].mix(input, learning_rate);
-        output_values[min_idx].mix(input, learning_rate);
+        output_values[min_idx].mix(required_output, learning_rate);
       }
     }
 
@@ -70,6 +82,16 @@ template <int input_size, int output_size, int hard_locations_count> class Assoc
         }
 
       result.mix(output_values[min_idx], 1.0);
+    }
+
+    float get_hard_location_by_idx(unsigned int hard_location_idx, unsigned int state_item_idx)
+    {
+      return hard_locations[hard_location_idx][state_item_idx];
+    }
+
+    float get_output_by_idx(unsigned int hard_location_idx, unsigned int output_idx)
+    {
+      return output_values[hard_location_idx][output_idx];
     }
 };
 

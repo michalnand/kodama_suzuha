@@ -34,7 +34,7 @@ void mem_init()
   mutex_init(&mutex_mem_);
 }
 
-void* malloc_safe(u32 size)
+void* malloc_safe(uint32_t size)
 {
   #ifdef LIB_MUTEX
   mutex_lock(&mutex_mem_);

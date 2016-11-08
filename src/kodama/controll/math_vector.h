@@ -6,7 +6,7 @@
 //MathVector class : vector of floats with specified size
 //some basic operators are implemented such : length. distance, dot and mix
 
-template <int size_> class MathVector: public Vector<float, size_>
+template <unsigned int size_> class MathVector: public Vector<float, size_>
 {
   public:
     //init vector of size_ with 0.0 values

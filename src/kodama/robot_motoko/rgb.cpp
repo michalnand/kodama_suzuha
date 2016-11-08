@@ -17,8 +17,6 @@ CRGB::~CRGB()
 
 int32_t CRGB::rgb_init()
 {
-  rgb_i2c_init();
-
   unsigned int i;
 
   for (i = 0; i < RGB_SENSORS_COUNT; i++)
@@ -68,7 +66,7 @@ int32_t CRGB::rgb_init()
   rgb_read();
 
   /*check correct sensor bus ID*/
-  u8 tmp[RGB_SENSORS_COUNT];
+  unsigned char tmp[RGB_SENSORS_COUNT];
   int32_t rgb_error_result = 0;
   rgb_i2c_read_reg(RGB_ADDRESS, RGB_COMMAND|RGB_ID, tmp);
 
@@ -107,7 +105,7 @@ int32_t CRGB::rgb_init()
 
 void CRGB::rgb_read(unsigned char calibration)
 {
-  u32 i;
+  uint32_t i;
 
 	rgb_i2cStart();
 	rgb_i2cWrite(RGB_ADDRESS);
@@ -122,7 +120,7 @@ void CRGB::rgb_read(unsigned char calibration)
 
 	rgb_i2cRead(1, rgb_raw);
 	for (i = 0; i < RGB_SENSORS_COUNT; i++)
-		rgb_result.ambient[i]|= ((u16)rgb_raw[i])<<8;
+		rgb_result.ambient[i]|= ((uint16_t)rgb_raw[i])<<8;
 
 	rgb_i2cRead(1, rgb_raw);
 	for (i = 0; i < RGB_SENSORS_COUNT; i++)
@@ -130,7 +128,7 @@ void CRGB::rgb_read(unsigned char calibration)
 
 	rgb_i2cRead(1, rgb_raw);
 	for (i = 0; i < RGB_SENSORS_COUNT; i++)
-		rgb_result.r[i]|= ((u16)rgb_raw[i])<<8;
+		rgb_result.r[i]|= ((uint16_t)rgb_raw[i])<<8;
 
 	rgb_i2cRead(1, rgb_raw);
 	for (i = 0; i < RGB_SENSORS_COUNT; i++)
@@ -138,15 +136,15 @@ void CRGB::rgb_read(unsigned char calibration)
 
 	rgb_i2cRead(1, rgb_raw);
 	for (i = 0; i < RGB_SENSORS_COUNT; i++)
-		rgb_result.g[i]|= ((u16)rgb_raw[i])<<8;
-
+		rgb_result.g[i]|= ((uint16_t)rgb_raw[i])<<8;
+ 
 	rgb_i2cRead(1, rgb_raw);
 	for (i = 0; i < RGB_SENSORS_COUNT; i++)
 		rgb_result.b[i] = rgb_raw[i];
 
 	rgb_i2cRead(1, rgb_raw);
 	for (i = 0; i < RGB_SENSORS_COUNT; i++)
-		rgb_result.b[i]|= ((u16)rgb_raw[i])<<8;
+		rgb_result.b[i]|= ((uint16_t)rgb_raw[i])<<8;
 
 
 	rgb_i2cRead(1, rgb_raw);
@@ -155,7 +153,7 @@ void CRGB::rgb_read(unsigned char calibration)
 
 	rgb_i2cRead(0, rgb_raw);
 	for (i = 0; i < RGB_SENSORS_COUNT; i++)
-		rgb_result.proximity[i]|= ((u16)rgb_raw[i])<<8;
+		rgb_result.proximity[i]|= ((uint16_t)rgb_raw[i])<<8;
 
 	rgb_i2cStop();
 

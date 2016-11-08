@@ -123,6 +123,11 @@ void CMotor::set_motor(uint32_t motor_id, int32_t value)
   motor_refresh();
 }
 
+void CMotor::motor_sleep()
+{
+
+}
+
 
 void CMotor::motor_refresh()
 {

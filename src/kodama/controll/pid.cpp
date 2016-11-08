@@ -1,16 +1,16 @@
 #include "pid.h"
 
-CPID::CPID(float kp, float ki, float kd, float output_range)
+CPID::CPID(float kp, float ki, float kd, float output_range_)
 {
-  init(kp, ki, kd, output_range);
+  init(kp, ki, kd, output_range_);
 }
 
 CPID::~CPID()
 {
 
-} 
+}
 
-void CPID::init(float kp, float ki, float kd, float output_range)
+void CPID::init(float kp, float ki, float kd, float output_range_)
 {
   e0 = 0.0;
   e1 = 0.0;
@@ -22,7 +22,7 @@ void CPID::init(float kp, float ki, float kd, float output_range)
 
   u = 0.0;
 
-  this->output_range = output_range;
+  this->output_range = output_range_;
 }
 
 

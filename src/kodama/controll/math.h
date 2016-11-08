@@ -12,6 +12,9 @@
 
 class CMath
 {
+  private:
+    unsigned int __rnda__, __rndb__;
+
   public:
     CMath();
     ~CMath();
@@ -29,6 +32,8 @@ class CMath
     float atan(float x);
     float atan2(float y, float x);
 
+    unsigned int rand();
+    float rnd();
 };
 
 extern CMath math;

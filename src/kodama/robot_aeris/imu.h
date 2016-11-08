@@ -18,7 +18,6 @@ class CIMU
 
     struct sIMUSensor imu_result;
 
-  protected:
     int32_t imu_ms_dt;
 
   public:

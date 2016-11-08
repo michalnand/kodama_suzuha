@@ -163,7 +163,7 @@ int CTerminal::puts(char *s)
 void CTerminal::puti(int32_t n)
 {
 	char flag = 0, s[12];
-	u32 ptr;
+	uint32_t ptr;
 
 	if (n < 0)
  	{

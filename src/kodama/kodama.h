@@ -19,7 +19,7 @@
 #include <controll/pid.h>
 
 #include <controll/associative_memory.h>
-
+#include <controll/line_position.h>
 
 #ifndef NULL
 #define NULL  0
@@ -38,6 +38,9 @@ class CKodama: public CGPIO, public CError, public CTerminal, public CTimer, pub
     int32_t init();
     int32_t init_();
 
+    void sleep();
+    void wakeup();
+
     void set_dt(int32_t ms_dt_);
 
 
@@ -55,6 +58,6 @@ class CKodama: public CGPIO, public CError, public CTerminal, public CTimer, pub
 
 };
 
-// extern class CKodama kodama;
+extern class CKodama kodama;
 
 #endif

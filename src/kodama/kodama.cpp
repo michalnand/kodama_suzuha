@@ -1,5 +1,6 @@
 #include "kodama.h"
 
+class CKodama kodama;
 
 CKodama::CKodama()
 {
@@ -66,10 +67,29 @@ int32_t CKodama::init_()
 }
 
 
+void CKodama::sleep()
+{
+  #ifdef LED_1
+  gpio_off(LED_1);
+  #endif
+
+  motor_sleep();
+}
+
+void CKodama::wakeup()
+{
+  #ifdef LED_1
+  gpio_on(LED_1);
+  #endif
+
+  set_motor(MOTOR_LEFT, 0);
+  set_motor(MOTOR_RIGHT, 0);
+}
+
+
 void CKodama::set_dt(int32_t ms_dt_)
 {
   this->ms_dt = ms_dt_;
-  imu_ms_dt = 10;
 }
 
 
@@ -99,7 +119,7 @@ int32_t CKodama::comm_send( unsigned char *tx_buffer, uint32_t tx_buffer_length,
 
 void CKodama::rotate_robot(int32_t angle, int32_t speed, int32_t (*terminating_func)())
 {
-  event_timer_set_period(0, this->ms_dt);
+  event_timer_set_period(0, 10);
 
   imu_read();
 

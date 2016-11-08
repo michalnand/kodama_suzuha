@@ -3,13 +3,11 @@
 
 #include <stdint.h>
 
-#define GPIO_BASE	GPIOB
+#define LED_0		(1<<15)    //main led, PB15
+#define LED_1		(1<<3)    //white led for sensors ilumination, PA3
+#define KEY 		(1<<9)    //main button, PB9
 
-#define LED_0		(15)    //main led, PB15
-#define LED_1		(3)    //white led for sensors ilumination, PA3
-#define KEY 		(9)    //main button, PB9
-
-#define ENCODER_CONSTANT ((u32)750) //670
+#define ENCODER_CONSTANT ((uint32_t)750) //670
 
 
 class CGPIO

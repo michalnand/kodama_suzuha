@@ -68,9 +68,6 @@
 
 class CRGB_I2C
 {
-  protected:
-    unsigned int rgb_read_all;
-
   public:
 
     CRGB_I2C();
@@ -85,9 +82,6 @@ class CRGB_I2C
 
     void rgb_i2c_write_reg(unsigned char dev_adr, unsigned char reg_adr, unsigned char value);
     void rgb_i2c_read_reg(unsigned char dev_adr, unsigned char reg_adr, unsigned char *res);
-
-    void rgb_i2c_enable_only_proximity();
-    void rgb_i2c_enable_all();
 
   private:
 

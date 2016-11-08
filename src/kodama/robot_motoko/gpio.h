@@ -5,10 +5,10 @@
 
 #define GPIO_BASE	GPIOB
 
-#define LED_0		((u32)(1<<15))
+#define LED_0		((uint32_t)(1<<15))
 #define KEY 		(1<<12)
 
-#define ENCODER_CONSTANT ((u32)750) //670
+#define ENCODER_CONSTANT ((uint32_t)750) //670
 
 
 class CGPIO
