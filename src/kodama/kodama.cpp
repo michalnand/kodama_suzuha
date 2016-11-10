@@ -9,7 +9,7 @@ CKodama::CKodama()
 
 CKodama::~CKodama()
 {
-
+ 
 }
 
 int32_t CKodama::init()

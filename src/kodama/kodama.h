@@ -19,6 +19,7 @@
 #include <controll/pid.h>
 
 #include <controll/associative_memory.h>
+#include <controll/reinforcement_learning.h>
 #include <controll/line_position.h>
 
 #ifndef NULL

@@ -1,6 +1,7 @@
 #include "demo.h"
 #include <kodama.h>
 
+#include "learning_line_follower.h"
 
 void hello_world()
 {
@@ -69,9 +70,15 @@ void basic_line_follower()
 #define ACTIONS_COUNT         ((uint32_t)3)
 #define HARD_LOCATIONS_COUNT  ((uint32_t)8)
 
+CLearningLineFollower learning_line_follower;
 
 void reinforcement_learning_line_follower()
 {
+
+  learning_line_follower.init();
+  learning_line_follower.main();
+
+  /*
   CLinePosition line_position;
 
   kodama.event_timer_set_period(0, 10);
@@ -155,4 +162,5 @@ void reinforcement_learning_line_follower()
       continue;
     }
   }
+  */
 }

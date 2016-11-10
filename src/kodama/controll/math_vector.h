@@ -12,14 +12,19 @@ template <unsigned int size_> class MathVector: public Vector<float, size_>
     //init vector of size_ with 0.0 values
     MathVector()
     {
-      unsigned int i;
-      for (i = 0; i < size_; i++)
-        this->arr[i] = 0.0;
+      init();
     }
 
     ~MathVector()
     {
 
+    }
+
+    void init()
+    {
+      unsigned int i;
+      for (i = 0; i < size_; i++)
+        this->arr[i] = 0.0;
     }
 
     //return squre vector length
