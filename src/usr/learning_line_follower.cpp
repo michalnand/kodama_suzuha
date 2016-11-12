@@ -1,9 +1,10 @@
 #include "learning_line_follower.h"
 
+CLearningLineFollower learning_line_follower;
 
 CLearningLineFollower::CLearningLineFollower()
 {
-  init();
+
 }
 
 CLearningLineFollower::~CLearningLineFollower()
@@ -11,18 +12,8 @@ CLearningLineFollower::~CLearningLineFollower()
 
 }
 
-void CLearningLineFollower::init()
+void CLearningLineFollower::run()
 {
-  rl.init();
-}
-
-
-void CLearningLineFollower::main()
-{
-  CLinePosition line_position;
-
-  MathVector<STATE_SIZE> state;
-
   while (1)
   {
     //obtain state -> read sensors and fill state vector
@@ -37,31 +28,29 @@ void CLearningLineFollower::main()
     //execute action
     switch (action_id)
     {
-      case 0:
-              kodama.set_motor(MOTOR_LEFT, SPEED_MAX/3);
-              kodama.set_motor(MOTOR_RIGHT, SPEED_MAX/3);
-              break;
+        case 0:
+                kodama.set_motor(MOTOR_LEFT, SPEED_MAX/3);
+                kodama.set_motor(MOTOR_RIGHT, SPEED_MAX/3);
+                break;
 
-      case 1:
-              kodama.set_motor(MOTOR_LEFT, 0);
-              kodama.set_motor(MOTOR_RIGHT, SPEED_MAX/3);
-              break;
+        case 1:
+                kodama.set_motor(MOTOR_LEFT, 0);
+                kodama.set_motor(MOTOR_RIGHT, SPEED_MAX/3);
+                break;
 
-      case 2:
-              kodama.set_motor(MOTOR_LEFT, SPEED_MAX/3);
-              kodama.set_motor(MOTOR_RIGHT, 0);
-              break;
+        case 2:
+                kodama.set_motor(MOTOR_LEFT, SPEED_MAX/3);
+                kodama.set_motor(MOTOR_RIGHT, 0);
+                break;
     }
+    timer.delay_ms(50);
 
-
-    //dt delay
-    kodama.delay_ms(50);
 
     //obatain reward from current line position
     kodama.rgb_read();
     line_position.process(kodama.get_rgb_result());
 
-      //just normalise reward into <-0.5 .. 0.5>
+    //just normalise reward into <-0.5 .. 0.5>
     float reward = (1.0 - math.abs(line_position.get_line_position())) - 0.5;
 
     //learn from reward (update Q-values from Q(state, action))
@@ -72,12 +61,12 @@ void CLearningLineFollower::main()
     {
       kodama.set_motor(MOTOR_LEFT, -SPEED_MAX/3);
       kodama.set_motor(MOTOR_RIGHT, -SPEED_MAX/3);
-      kodama.delay_ms(300);
+      timer.delay_ms(300);
 
       kodama.set_motor(MOTOR_LEFT, 0);
       kodama.set_motor(MOTOR_RIGHT, 0);
-      kodama.delay_ms(100);
-      continue;
+      timer.delay_ms(100);
+      return;
     }
   }
 }

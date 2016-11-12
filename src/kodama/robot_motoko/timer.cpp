@@ -2,6 +2,8 @@
 
 #include <device.h>
 
+class CTimer timer;
+
 volatile time_t __system_time__;
 
 
@@ -9,11 +11,39 @@ volatile uint32_t __event_timer_cnt__[EVENT_TIMER_COUNT];
 volatile uint32_t __event_timer_csr__[EVENT_TIMER_COUNT];
 volatile uint8_t __event_timer_flag__[EVENT_TIMER_COUNT];
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+void TIM3_IRQHandler()
+{
+  uint32_t i;
+  for (i = 0; i < EVENT_TIMER_COUNT; i++)
+  {
+     if ((__event_timer_flag__[i] != 0) && (__event_timer_flag__[i] < 255))
+       __event_timer_flag__[i]++;
+
+     if (__event_timer_cnt__[i])
+       __event_timer_cnt__[i]--;
+     else
+     {
+       __event_timer_cnt__[i] = __event_timer_csr__[i];
+       if (__event_timer_flag__[i] == 0)
+         __event_timer_flag__[i] = 1;
+     }
+  }
+
+  __system_time__++;
+  TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+}
+
+#ifdef __cplusplus
+}
+#endif
 
 CTimer::CTimer()
 {
-
+  timer_init();
 }
 
 CTimer::~CTimer()
@@ -23,6 +53,8 @@ CTimer::~CTimer()
 
 int32_t CTimer::timer_init()
 {
+  __system_time__ = 0;
+
   unsigned int i;
 
   for (i = 0; i < EVENT_TIMER_COUNT; i++)
@@ -32,19 +64,15 @@ int32_t CTimer::timer_init()
     __event_timer_flag__[i] = 0;
   }
 
-  __system_time__ = 0;
-
-
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
 
-
-  TIM_TimeBaseInitTypeDef timer;
-  timer.TIM_Prescaler = 280; //(84 - 1);
-  timer.TIM_CounterMode = TIM_CounterMode_Up;
-  timer.TIM_Period = 50 - 1;
-  timer.TIM_ClockDivision = TIM_CKD_DIV1;
-  timer.TIM_RepetitionCounter = 0;
-  TIM_TimeBaseInit(TIM3, &timer);
+  TIM_TimeBaseInitTypeDef timer_init_struct;
+  timer_init_struct.TIM_Prescaler = 280; //(84 - 1);
+  timer_init_struct.TIM_CounterMode = TIM_CounterMode_Up;
+  timer_init_struct.TIM_Period = 50 - 1;
+  timer_init_struct.TIM_ClockDivision = TIM_CKD_DIV1;
+  timer_init_struct.TIM_RepetitionCounter = 0;
+  TIM_TimeBaseInit(TIM3, &timer_init_struct);
 
   TIM_Cmd(TIM3, ENABLE);
 
@@ -60,36 +88,6 @@ int32_t CTimer::timer_init()
   return 0;
 }
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void TIM3_IRQHandler()
-{
-  uint32_t i;
-  for (i = 0; i < EVENT_TIMER_COUNT; i++)
-  {
-    if ((__event_timer_flag__[i] != 0) && (__event_timer_flag__[i] < 255))
-      __event_timer_flag__[i]++;
-
-    if (__event_timer_cnt__[i])
-      __event_timer_cnt__[i]--;
-    else
-    {
-      __event_timer_cnt__[i] = __event_timer_csr__[i];
-      if (__event_timer_flag__[i] == 0)
-        __event_timer_flag__[i] = 1;
-    }
-  }
-  __system_time__++;
-
-  TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
-}
-
-#ifdef __cplusplus
-}
-#endif
-
 time_t CTimer::get_time()
 {
   volatile time_t time;
@@ -101,13 +99,11 @@ time_t CTimer::get_time()
   return (time/10);
 }
 
-
 void CTimer::delay_loops(uint32_t loops)
 {
   while (loops--)
     __asm("nop");
 }
-
 
 void CTimer::delay_ms(uint32_t time_ms)
 {
@@ -115,6 +111,7 @@ void CTimer::delay_ms(uint32_t time_ms)
   while (time_end > get_time())
     core_yield();
 }
+
 
 void CTimer::event_timer_set_period(uint8_t timer_id, uint32_t period_ms)
 {

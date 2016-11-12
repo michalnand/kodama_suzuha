@@ -10,7 +10,6 @@ int main()
   if (kodama.init() != 0)
     kodama.error_func();
 
-
   kodama.set_dt(10);
   kodama.sleep();
 
@@ -21,17 +20,19 @@ int main()
     {
       kodama.wakeup();
 
-      //hello_world();
-      //basic_line_follower();
-      reinforcement_learning_line_follower();
+      demo.init();
+
+      //demo.run(DEMO_HELLO_WORLD);
+      demo.run(DEMO_BASIC_LINE_FOLLOWER);
+      //demo.run(DEMO_LEARNING_LINE_FOLLOWER);
     }
 
     kodama.gpio_on(LED_0);
-    kodama.delay_ms(10);
+    timer.delay_ms(10);
 
     kodama.gpio_off(LED_0);
-    kodama.delay_ms(300);
+    timer.delay_ms(300);
 
-    kodama.printf("idle %u\n", kodama.get_time());
+    kodama.printf("idle %u\n", timer.get_time());
   }
 }

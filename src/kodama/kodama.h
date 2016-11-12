@@ -13,6 +13,9 @@
 
 #include <config.h>
 
+#include "system/rt_timer.h"
+
+
 #include <controll/vector.h>
 #include <controll/math_vector.h>
 #include <controll/math.h>
@@ -26,7 +29,7 @@
 #define NULL  0
 #endif
 
-class CKodama: public CGPIO, public CError, public CTerminal, public CTimer, public CSensors, public CMotor
+class CKodama: public CGPIO, public CError, public CTerminal, public CSensors, public CMotor
 {
   private:
     int32_t ms_dt;

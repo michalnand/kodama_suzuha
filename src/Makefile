@@ -7,6 +7,7 @@ SRCS+= $(shell find device/stm32f30x/ -name '*.c')
 SRCS+= $(shell find suzuha/ -name '*.c')
 
 CXX_SRCS = kodama/kodama.cpp
+CXX_SRCS+= $(shell find kodama/system/ -name '*.cpp')
 CXX_SRCS+= $(shell find kodama/controll/ -name '*.cpp')
 CXX_SRCS+= $(shell find kodama/robot_aeris/ -name '*.cpp')
 CXX_SRCS+= $(shell find usr/ -name '*.cpp')
@@ -18,6 +19,7 @@ INC+= -I"./suzuha/"
 INC+= -I"./kodama/robot_aeris/"
 
 INC+= -I"./kodama/"
+INC+= -I"./kodama/system/"
 INC+= -I"./kodama/controll/"
 
 

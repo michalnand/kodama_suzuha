@@ -9,7 +9,7 @@ CKodama::CKodama()
 
 CKodama::~CKodama()
 {
- 
+
 }
 
 int32_t CKodama::init()
@@ -49,7 +49,7 @@ int32_t CKodama::init_()
   #endif
 
   #ifdef _TIMER_H_
-  if ((init_res = timer_init()) < 0)
+  if ((init_res = timer.timer_init()) < 0)
     return -30000 + init_res;
   #endif
 
@@ -119,7 +119,6 @@ int32_t CKodama::comm_send( unsigned char *tx_buffer, uint32_t tx_buffer_length,
 
 void CKodama::rotate_robot(int32_t angle, int32_t speed, int32_t (*terminating_func)())
 {
-  event_timer_set_period(0, 10);
 
   imu_read();
 
@@ -130,10 +129,8 @@ void CKodama::rotate_robot(int32_t angle, int32_t speed, int32_t (*terminating_f
 
   while (1)
   {
-    uint32_t res = event_timer_check(0);
+    timer.delay_ms(10);
 
-    if (res != 0)
-    {
       if (terminating_func != NULL)
         if (terminating_func() != 0)    //terminating func returns non zero - terminate action
           break;
@@ -160,12 +157,11 @@ void CKodama::rotate_robot(int32_t angle, int32_t speed, int32_t (*terminating_f
 
       if (tmp < 50)
         break;
-    }
   }
 
   set_motor(MOTOR_LEFT, 0);
   set_motor(MOTOR_RIGHT, 0);
-  delay_ms(20);
+  timer.delay_ms(20);
 }
 
 
@@ -176,9 +172,6 @@ void CKodama::go_forward(int32_t distance, int32_t speed, int32_t (*terminating_
                   PID_FORWARD_KD,
                   PID_FORWARD_U);
 
-
-
-  event_timer_set_period(0, this->ms_dt);
 
   imu_read();
 
@@ -191,9 +184,8 @@ void CKodama::go_forward(int32_t distance, int32_t speed, int32_t (*terminating_
 
   while (1)
   {
-    uint32_t res = event_timer_check(0);
-    if (res != 0)
-    {
+    timer.delay_ms(10);
+
       if (terminating_func != NULL)
         if (terminating_func() != 0)    //terminating func returns non zero - terminate action
           break;
@@ -210,12 +202,11 @@ void CKodama::go_forward(int32_t distance, int32_t speed, int32_t (*terminating_
 
       set_motor(MOTOR_LEFT, dif_speed + speed_);
       set_motor(MOTOR_RIGHT, -dif_speed + speed_);
-    }
   }
 
 
   set_motor(MOTOR_LEFT, 0);
   set_motor(MOTOR_RIGHT, 0);
 
-  delay_ms(20);
+  timer.delay_ms(20);
 }
