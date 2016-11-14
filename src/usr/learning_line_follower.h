@@ -11,8 +11,6 @@
 class CLearningLineFollower
 {
   private:
-    class CRTTimer rt_timer;
-
     CLinePosition line_position;
     MathVector<STATE_SIZE> state;
     class ReinforcementLearning<STATE_SIZE, ACTIONS_COUNT, HARD_LOCATIONS_COUNT> rl;

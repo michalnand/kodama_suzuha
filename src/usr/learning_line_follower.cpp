@@ -14,13 +14,16 @@ CLearningLineFollower::~CLearningLineFollower()
 
 void CLearningLineFollower::run()
 {
+  rl.init();
   while (1)
   {
     //obtain state -> read sensors and fill state vector
     kodama.rgb_read();
 
     line_position.process(kodama.get_rgb_result());
-    line_position.get_vector(&state);
+    //line_position.get_vector(&state);
+
+    state.add(line_position.get_line_position());
 
     //select action, using loaded learned q-values from current state
     unsigned int action_id = rl.process(state);
@@ -66,7 +69,6 @@ void CLearningLineFollower::run()
       kodama.set_motor(MOTOR_LEFT, 0);
       kodama.set_motor(MOTOR_RIGHT, 0);
       timer.delay_ms(100);
-      return;
     }
   }
 }
