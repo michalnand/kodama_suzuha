@@ -15,6 +15,9 @@ CLearningLineFollower::~CLearningLineFollower()
 void CLearningLineFollower::run()
 {
   rl.init();
+
+  float score = -1.0;
+
   while (1)
   {
     //obtain state -> read sensors and fill state vector
@@ -70,5 +73,11 @@ void CLearningLineFollower::run()
       kodama.set_motor(MOTOR_RIGHT, 0);
       timer.delay_ms(100);
     }
+
+    float k = 0.01;
+    score = (1.0 - k)*score + k*reward;
+
+    //TODO printf with %f
+    kodama.printf("%i \n", (int)(1000*score));
   }
 }

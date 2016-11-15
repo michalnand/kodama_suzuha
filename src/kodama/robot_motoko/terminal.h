@@ -1,11 +1,11 @@
 #ifndef _TERMINAL_H_
 #define _TERMINAL_H_
 
-
 #include <stdint.h>
 
+#include "terminal_interface.h"
 
-class CTerminal
+class CTerminal:public CTerminalInterface
 {
   public:
     CTerminal();
