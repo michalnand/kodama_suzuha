@@ -28,7 +28,7 @@ class CTerminal:public CTerminalInterface
     void putx(uint32_t n);
 
     /*print float on 3 decimal places*/
-    void putf(float n);
+    void putf(float n, unsigned int decimal_places = 3);
 
 
     void printf(const char *str, ...);

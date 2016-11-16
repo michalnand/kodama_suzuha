@@ -112,6 +112,8 @@ int32_t CGPIO::gpio_init()
   g_left_encoder = 0;
   g_right_encoder = 0;
 
+  gpio_on(LED_0);
+
   return 0;
 }
 

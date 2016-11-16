@@ -1,7 +1,3 @@
-#SRCS_DEVICE_LIBS = $(shell find $(DEVICE_LIBS) -name '*.c')
-#SRCS = $(shell find -name '*.c' -not -path "*/device/*")
-#SRCS+= $(SRCS_DEVICE_LIBS)
-
 SRCS = main.c
 SRCS+= $(shell find device/stm32f30x/ -name '*.c')
 SRCS+= $(shell find suzuha/ -name '*.c')
@@ -9,23 +5,24 @@ SRCS+= $(shell find suzuha/ -name '*.c')
 CXX_SRCS = kodama/kodama.cpp
 CXX_SRCS+= $(shell find kodama/system/ -name '*.cpp')
 CXX_SRCS+= $(shell find kodama/controll/ -name '*.cpp')
-CXX_SRCS+= $(shell find kodama/robot_aeris/ -name '*.cpp')
+CXX_SRCS+= $(shell find kodama/robot_motoko/ -name '*.cpp')
 CXX_SRCS+= $(shell find usr/ -name '*.cpp')
 
 
 INC = -I"./device/"
 INC+= -I"./device/stm32f30x/"
 INC+= -I"./suzuha/"
-INC+= -I"./kodama/robot_aeris/"
+INC+= -I"./kodama/robot_motoko/"
 
 INC+= -I"./kodama/"
 INC+= -I"./kodama/system/"
 INC+= -I"./kodama/controll/"
 
 
+TARGET = -mcpu=cortex-m4 -mthumb  -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fsingle-precision-constant
 
 
-TARGET = -mcpu=cortex-m4 -mthumb -mfloat-abi=softfp -mfpu=vfp -fsingle-precision-constant
+
 DEVICE_LIBS = device/stm32f30x
 
 #GCCPREFIX=~/bin/arm-none-eabi/bin/

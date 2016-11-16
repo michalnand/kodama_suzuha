@@ -1,6 +1,6 @@
 #include "terminal.h"
 
-// #include "stdarg.h"
+#include "stdarg.h"
 #include <device.h>
 
 
@@ -242,52 +242,28 @@ void CTerminal::putx(uint32_t n)
 }
 
 
-void CTerminal::putf(float n)
+void CTerminal::putf(float n, unsigned int decimal_places)
 {
-  float limit = 1000000.0;
-  if (n > limit)
-    n = limit;
-  if (n < -limit)
-    n = -limit;
+  unsigned int i, power = 1;
+  for (i = 0; i < decimal_places; i++)
+    power*= 10;
 
-  int32_t tmp = (1000.0*n);
-  puti(tmp);
+  int int_part = (int)n;
+  int frac_part = (int)((n - int_part)*power);
+  if (frac_part < 0)
+    frac_part = -frac_part;
 
-  if (tmp < 0)
-    tmp = -tmp;
-  tmp = tmp%1000;
-
+  puti(int_part);
   putchar('.');
-  puti(tmp);
+  puti(frac_part);
 }
-
-void swap(unsigned char *a, unsigned char *b)
-{
-  unsigned char tmp = *a;
-  *a = *b;
-  *b = tmp;
-}
-
-union uFloatmap
-{
-  unsigned char b[4];
-  uint32_t ui;
-  float f;
-};
-
-
-typedef unsigned char  __attribute__ ((aligned (4))) *va_list;
-
-#define va_start(list, param) (list = (((va_list)&param) + sizeof(param)))
-#define va_arg(list, type)    (*(type *)((list+= sizeof(type)) - sizeof(type)))
 
 void CTerminal::printf(const char *str, ...)
 {
+	va_list args;
+	va_start(args, str);
 
   unsigned int s_ptr = 0;
-
-	va_list args;				/*begin stack working*/
-	va_start(args, str);
 
 	while (str[s_ptr] != '\0')			/*scan string*/
  	{
@@ -300,30 +276,22 @@ void CTerminal::printf(const char *str, ...)
 		{		/*switch %? argumet*/
 	    	s_ptr++;
 
-				/*print correct argument, get value from stack : va_arg*/
-        union uFloatmap tmp;
-
 	    	switch (str[s_ptr])
 	    	{
 	     		case 'i': puti(va_arg(args, int)); break;
 	     		case 'u': putui(va_arg(args, int)); break;
 	     		case 'x': putx(va_arg(args, int)); break;
-	     		case 'c': putchar(va_arg(args, int)); break;		/*yeah, stack is 32bit alligment, dont take char or u16*/
+	     		case 'c': putchar(va_arg(args, int)); break;
 	     		case 's': puts((char*)va_arg(args, int)); break;
 	     		case '%': putchar('%'); break;
-          case 'f':
-
-                    tmp.ui = va_arg(args, int);
-                    swap(&tmp.b[0], &tmp.b[1]);
-                    swap(&tmp.b[2], &tmp.b[3]);
-                    putf(tmp.f);
-                  //   putf(va_arg(args, float));
-
-                    break;
+          case 'f': putf(va_arg(args, double), 3); break;
 	    	}
+
 			  s_ptr++;
 	   }
 	}
+
+  va_end(args);
 }
 
 char* CTerminal::gets(char *s)

@@ -241,13 +241,29 @@ void CTerminal::putx(uint32_t n)
  	puts(s + ptr);
 }
 
+
+void CTerminal::putf(float n, unsigned int decimal_places)
+{
+  unsigned int i, power = 1;
+  for (i = 0; i < decimal_places; i++)
+    power*= 10;
+
+  int int_part = (int)n;
+  int frac_part = (int)((n - int_part)*power);
+  if (frac_part < 0)
+    frac_part = -frac_part;
+
+  puti(int_part);
+  putchar('.');
+  puti(frac_part);
+}
+
 void CTerminal::printf(const char *str, ...)
 {
-  unsigned int s_ptr;
-
-	va_list args;				/*begin stack working*/
+	va_list args;
 	va_start(args, str);
-	s_ptr = 0;
+
+  unsigned int s_ptr = 0;
 
 	while (str[s_ptr] != '\0')			/*scan string*/
  	{
@@ -255,27 +271,27 @@ void CTerminal::printf(const char *str, ...)
 		{
 			putchar(str[s_ptr]);			/*if no % print char*/
 			s_ptr++;
-   		}
+   	}
 		else
 		{		/*switch %? argumet*/
 	    	s_ptr++;
-				/*print correct argument, get value from stack : va_arg*/
 
 	    	switch (str[s_ptr])
 	    	{
 	     		case 'i': puti(va_arg(args, int)); break;
 	     		case 'u': putui(va_arg(args, int)); break;
 	     		case 'x': putx(va_arg(args, int)); break;
-	     		case 'c': putchar(va_arg(args, int)); break;		/*yeah, stack is 32bit alligment, dont take char or u16*/
+	     		case 'c': putchar(va_arg(args, int)); break;
 	     		case 's': puts((char*)va_arg(args, int)); break;
 	     		case '%': putchar('%'); break;
+          case 'f': putf(va_arg(args, double), 3); break;
 	    	}
 
 			  s_ptr++;
 	   }
 	}
 
-	va_end(args);				/*stack working end*/
+  va_end(args);
 }
 
 char* CTerminal::gets(char *s)

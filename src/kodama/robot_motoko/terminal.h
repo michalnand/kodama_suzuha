@@ -1,8 +1,8 @@
 #ifndef _TERMINAL_H_
 #define _TERMINAL_H_
 
-#include <stdint.h>
 
+#include <stdint.h>
 #include "terminal_interface.h"
 
 class CTerminal:public CTerminalInterface
@@ -26,6 +26,10 @@ class CTerminal:public CTerminalInterface
 
     /*print unsigned int as hex*/
     void putx(uint32_t n);
+
+    /*print float on 3 decimal places*/
+    void putf(float n, unsigned int decimal_places = 3);
+
 
     void printf(const char *str, ...);
     char* gets(char *s);

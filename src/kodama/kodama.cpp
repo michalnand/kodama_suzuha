@@ -43,6 +43,7 @@ int32_t CKodama::init_()
     return -10000 + init_res;
   #endif
 
+
   #ifdef _TERMINAL_H_
   if ((init_res = terminal_init()) < 0)
     return -20000 + init_res;
