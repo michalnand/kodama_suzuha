@@ -24,9 +24,8 @@ void CLearningLineFollower::run()
     kodama.rgb_read();
 
     line_position.process(kodama.get_rgb_result());
-    //line_position.get_vector(&state);
-
-    state.add(line_position.get_line_position());
+    line_position.get_vector(&state);
+    //state.add(line_position.get_line_position());
 
     //select action, using loaded learned q-values from current state
     unsigned int action_id = rl.process(state);
@@ -40,13 +39,13 @@ void CLearningLineFollower::run()
                 break;
 
         case 1:
-                kodama.set_motor(MOTOR_LEFT, 0);
+                kodama.set_motor(MOTOR_LEFT, -SPEED_MAX/8);
                 kodama.set_motor(MOTOR_RIGHT, SPEED_MAX/3);
                 break;
 
         case 2:
                 kodama.set_motor(MOTOR_LEFT, SPEED_MAX/3);
-                kodama.set_motor(MOTOR_RIGHT, 0);
+                kodama.set_motor(MOTOR_RIGHT, -SPEED_MAX/8);
                 break;
     }
     timer.delay_ms(50);
@@ -67,7 +66,7 @@ void CLearningLineFollower::run()
     {
       kodama.set_motor(MOTOR_LEFT, -SPEED_MAX/3);
       kodama.set_motor(MOTOR_RIGHT, -SPEED_MAX/3);
-      timer.delay_ms(300);
+      timer.delay_ms(450);
 
       kodama.set_motor(MOTOR_LEFT, 0);
       kodama.set_motor(MOTOR_RIGHT, 0);

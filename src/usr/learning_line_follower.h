@@ -3,7 +3,7 @@
 
 #define STATE_SIZE            RGB_SENSORS_COUNT
 #define ACTIONS_COUNT         ((uint32_t)3)
-#define HARD_LOCATIONS_COUNT  ((uint32_t)16)
+#define HARD_LOCATIONS_COUNT  ((uint32_t)32)
 
 #include <kodama.h>
 

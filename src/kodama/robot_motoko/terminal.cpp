@@ -240,7 +240,7 @@ void CTerminal::putx(uint32_t n)
 	ptr++;
  	puts(s + ptr);
 }
-
+ 
 
 void CTerminal::putf(float n, unsigned int decimal_places)
 {
