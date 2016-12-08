@@ -54,15 +54,17 @@ int32_t CKodama::init_()
     return -30000 + init_res;
   #endif
 
+  #ifdef _MOTORS_H_
+  if ((init_res = motor_init()) < 0)
+    return -50000 + init_res;
+  #endif
+
+
   #ifdef _SENSORS_H_
   if ((init_res = sensors_init()) < 0)
     return -40000 + init_res;
   #endif
 
-  #ifdef _MOTORS_H_
-  if ((init_res = motor_init()) < 0)
-    return -50000 + init_res;
-  #endif
 
   return init_res;
 }

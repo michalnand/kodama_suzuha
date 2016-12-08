@@ -59,22 +59,26 @@ void CDemo::blink_task()
 
 void CDemo::moves_task()
 {
-  kodama.set_motor(MOTOR_LEFT, SPEED_MAX/2);
+  kodama.set_motor(MOTOR_LEFT, 20);
   kodama.set_motor(MOTOR_RIGHT, 0);
   timer.delay_ms(800);
 
-  kodama.set_motor(MOTOR_LEFT, -SPEED_MAX/2);
+  kodama.set_motor(MOTOR_LEFT, -20);
   kodama.set_motor(MOTOR_RIGHT, 0);
   timer.delay_ms(800);
 
 
   kodama.set_motor(MOTOR_LEFT, 0);
-  kodama.set_motor(MOTOR_RIGHT, -SPEED_MAX/2);
+  kodama.set_motor(MOTOR_RIGHT, -20);
   timer.delay_ms(800);
 
   kodama.set_motor(MOTOR_LEFT, 0);
-  kodama.set_motor(MOTOR_RIGHT, SPEED_MAX/2);
+  kodama.set_motor(MOTOR_RIGHT, 20);
   timer.delay_ms(800);
+
+
+  kodama.set_motor(MOTOR_LEFT, 0);
+  kodama.set_motor(MOTOR_RIGHT, 0);
 
 
 /*

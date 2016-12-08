@@ -127,8 +127,7 @@ int32_t CMotor::motor_init()
 
 
   for (i = 0; i < MOTORS_COUNT; i++)
-    set_motor(i, -50);
-
+    set_motor(i, 0);
 
   return 0;
 }
@@ -173,6 +172,7 @@ void CMotor::motor_refresh()
 
 		left_pwm = -left_pwm;
 	}
+
 
   //set rotation direction for right motor
   //break
