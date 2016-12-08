@@ -50,12 +50,34 @@ void CDemo::blink_task()
 
     timer.delay_ms(10);
     kodama.gpio_off(LED_0);
+
+    timer.delay_ms(800);
+
   }
 }
 
 
 void CDemo::moves_task()
 {
+  kodama.set_motor(MOTOR_LEFT, SPEED_MAX/2);
+  kodama.set_motor(MOTOR_RIGHT, 0);
+  timer.delay_ms(800);
+
+  kodama.set_motor(MOTOR_LEFT, -SPEED_MAX/2);
+  kodama.set_motor(MOTOR_RIGHT, 0);
+  timer.delay_ms(800);
+
+
+  kodama.set_motor(MOTOR_LEFT, 0);
+  kodama.set_motor(MOTOR_RIGHT, -SPEED_MAX/2);
+  timer.delay_ms(800);
+
+  kodama.set_motor(MOTOR_LEFT, 0);
+  kodama.set_motor(MOTOR_RIGHT, SPEED_MAX/2);
+  timer.delay_ms(800);
+
+
+/*
   kodama.rotate_robot( 900, SPEED_MAX/2, NULL);
   kodama.rotate_robot( 900, SPEED_MAX/2, NULL);
   kodama.rotate_robot( 900, SPEED_MAX/2, NULL);
@@ -66,6 +88,7 @@ void CDemo::moves_task()
   kodama.rotate_robot(-900, SPEED_MAX/2, NULL);
   kodama.rotate_robot(-900, SPEED_MAX/2, NULL);
   kodama.rotate_robot(-900, SPEED_MAX/2, NULL);
+*/
 }
 
 

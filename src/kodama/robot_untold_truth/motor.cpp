@@ -4,15 +4,15 @@
 
 //RIGHT motor gpio
 #define VNH3SP30_RIGHT_INA_GPIO		 GPIOB
-#define VNH3SP30_RIGHT_INA			   ((uint32_t)(1<<4))
-#define VNH3SP30_RIGHT_INB_GPIO		 GPIOB
-#define VNH3SP30_RIGHT_INB			   ((uint32_t)(1<<4))
+#define VNH3SP30_RIGHT_INA			   ((uint32_t)(1<<5))
+#define VNH3SP30_RIGHT_INB_GPIO		 GPIOC
+#define VNH3SP30_RIGHT_INB			   ((uint32_t)(1<<10))
 
 //left motor GPIO
-#define VNH3SP30_LEFT_INA_GPIO		 GPIOB
-#define VNH3SP30_LEFT_INA			   ((uint32_t)(1<<4))
-#define VNH3SP30_LEFT_INB_GPIO		 GPIOB
-#define VNH3SP30_LEFT_INB			   ((uint32_t)(1<<4))
+#define VNH3SP30_LEFT_INA_GPIO		 GPIOA
+#define VNH3SP30_LEFT_INA			   ((uint32_t)(1<<15))
+#define VNH3SP30_LEFT_INB_GPIO		 GPIOC
+#define VNH3SP30_LEFT_INB			   ((uint32_t)(1<<11))
 
 
 
@@ -59,7 +59,7 @@ int32_t CMotor::motor_init()
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 
-  GPIO_Init(VNH3SP30_RIGHT_INA_GPIO, &GPIO_InitStructure);
+  GPIO_Init(VNH3SP30_RIGHT_INB_GPIO, &GPIO_InitStructure);
   VNH3SP30_RIGHT_INB_GPIO->BSRR = VNH3SP30_RIGHT_INB;   //pin to one
 
 
@@ -81,7 +81,7 @@ int32_t CMotor::motor_init()
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 
-  GPIO_Init(VNH3SP30_LEFT_INA_GPIO, &GPIO_InitStructure);
+  GPIO_Init(VNH3SP30_LEFT_INB_GPIO, &GPIO_InitStructure);
   VNH3SP30_LEFT_INB_GPIO->BSRR = VNH3SP30_LEFT_INB;   //pin to one
 
 
@@ -127,7 +127,7 @@ int32_t CMotor::motor_init()
 
 
   for (i = 0; i < MOTORS_COUNT; i++)
-    set_motor(i, 0);
+    set_motor(i, -50);
 
 
   return 0;
@@ -156,8 +156,8 @@ void CMotor::motor_refresh()
   //break
   if (left_pwm == 0)
   {
-    VNH3SP30_LEFT_INA_GPIO->BRR = VNH3SP30_LEFT_INA;
-    VNH3SP30_LEFT_INB_GPIO->BRR = VNH3SP30_LEFT_INB;
+    VNH3SP30_LEFT_INA_GPIO->BSRR = VNH3SP30_LEFT_INA;
+    VNH3SP30_LEFT_INB_GPIO->BSRR = VNH3SP30_LEFT_INB;
     left_pwm = SPEED_MAX;
   }
   else
@@ -178,8 +178,8 @@ void CMotor::motor_refresh()
   //break
   if (right_pwm == 0)
   {
-    VNH3SP30_RIGHT_INA_GPIO->BRR = VNH3SP30_RIGHT_INA;
-    VNH3SP30_RIGHT_INB_GPIO->BRR = VNH3SP30_RIGHT_INB;
+    VNH3SP30_RIGHT_INA_GPIO->BSRR = VNH3SP30_RIGHT_INA;
+    VNH3SP30_RIGHT_INB_GPIO->BSRR = VNH3SP30_RIGHT_INB;
     right_pwm = SPEED_MAX;
   }
   else
