@@ -1,12 +1,17 @@
 #/bin/bash
 
 #device=motoko
-device=aeris
+device=untold_truth
+#device=aeris
 
 echo configuring for device $device
 
 if [ "$device" == "motoko" ] ; then
 	cp makefiles/Makefile_motoko Makefile
+fi
+
+if [ "$device" == "untold_truth" ] ; then
+	cp makefiles/Makefile_untold_truth Makefile
 fi
 
 if [ "$device" == "aeris" ] ; then
