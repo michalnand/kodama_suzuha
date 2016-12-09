@@ -2,17 +2,25 @@
 
 #include <device.h>
 
-//RIGHT motor gpio
-#define VNH3SP30_RIGHT_INA_GPIO		 GPIOB
-#define VNH3SP30_RIGHT_INA			   ((uint32_t)(1<<5))
-#define VNH3SP30_RIGHT_INB_GPIO		 GPIOC
-#define VNH3SP30_RIGHT_INB			   ((uint32_t)(1<<10))
+#define MOTOR_ENABLE_GPIO         GPIOC
+#define MOTOR_ENABLE			   ((uint32_t)(1<<7))
+
+//right motor gpio
+#define VNH3SP30_LEFT_INA_GPIO		 GPIOB
+#define VNH3SP30_LEFT_INA			   ((uint32_t)(1<<5))
+#define VNH3SP30_LEFT_INB_GPIO		 GPIOC
+#define VNH3SP30_LEFT_INB			   ((uint32_t)(1<<10))
 
 //left motor GPIO
-#define VNH3SP30_LEFT_INA_GPIO		 GPIOA
-#define VNH3SP30_LEFT_INA			   ((uint32_t)(1<<15))
-#define VNH3SP30_LEFT_INB_GPIO		 GPIOC
-#define VNH3SP30_LEFT_INB			   ((uint32_t)(1<<11))
+/* //stare !!!!!!
+#define VNH3SP30_RIGHT_INA_GPIO		 GPIOA
+#define VNH3SP30_RIGHT_INA			   ((uint32_t)(1<<15))
+*/
+#define VNH3SP30_RIGHT_INA_GPIO		 GPIOD
+#define VNH3SP30_RIGHT_INA			   ((uint32_t)(1<<2))
+
+#define VNH3SP30_RIGHT_INB_GPIO		 GPIOC
+#define VNH3SP30_RIGHT_INB			   ((uint32_t)(1<<11))
 
 
 
@@ -22,8 +30,9 @@
 #define PWM_PERIOD      ((SystemCoreClock/PWM_FREQUENCY) - 1)
 
 
-#define PWM_CH_1 	(1<<13)	//right
-#define PWM_CH_2 	(1<<14)	//left
+#define PWM_CH_1 	(1<<14)	//right
+#define PWM_CH_2 	(1<<13)	//left
+
 
 
 CMotor::CMotor()
@@ -85,6 +94,15 @@ int32_t CMotor::motor_init()
   VNH3SP30_LEFT_INB_GPIO->BSRR = VNH3SP30_LEFT_INB;   //pin to one
 
 
+  //enable bridges
+  GPIO_InitStructure.GPIO_Pin = MOTOR_ENABLE;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+
+  GPIO_Init(VNH3SP30_LEFT_INB_GPIO, &GPIO_InitStructure);
+  MOTOR_ENABLE_GPIO->BSRR = MOTOR_ENABLE;   //pin to one
 
 
 
@@ -140,6 +158,14 @@ void CMotor::set_motor(uint32_t motor_id, int32_t value)
   motor_refresh();
 }
 
+void CMotor::set_motors(int32_t left_motor, int32_t right_motor)
+{
+  motors[MOTOR_LEFT] = left_motor;
+  motors[MOTOR_RIGHT] = right_motor;
+
+  motor_refresh();
+}
+
 void CMotor::motor_sleep()
 {
 
@@ -150,6 +176,21 @@ void CMotor::motor_refresh()
 {
   int32_t left_pwm = motors[MOTOR_LEFT];
   int32_t right_pwm = motors[MOTOR_RIGHT];
+
+
+  //PWM limitation
+	if (left_pwm > SPEED_MAX)
+		left_pwm = SPEED_MAX;
+
+	if (right_pwm > SPEED_MAX)
+		right_pwm = SPEED_MAX;
+
+    //PWM limitation
+  if (left_pwm < -SPEED_MAX)
+  	left_pwm = -SPEED_MAX;
+
+  if (right_pwm < -SPEED_MAX)
+  	right_pwm = -SPEED_MAX;
 
   //set rotation direction for left motor
   //break
@@ -162,13 +203,13 @@ void CMotor::motor_refresh()
   else
   if (left_pwm > 0)
 	{
-    VNH3SP30_LEFT_INA_GPIO->BRR = VNH3SP30_LEFT_INA;
-    VNH3SP30_LEFT_INB_GPIO->BSRR = VNH3SP30_LEFT_INB;
+    VNH3SP30_LEFT_INA_GPIO->BSRR = VNH3SP30_LEFT_INA;
+    VNH3SP30_LEFT_INB_GPIO->BRR = VNH3SP30_LEFT_INB;
 	}
 	else
 	{
-    VNH3SP30_LEFT_INA_GPIO->BSRR = VNH3SP30_LEFT_INA;
-    VNH3SP30_LEFT_INB_GPIO->BRR = VNH3SP30_LEFT_INB;
+    VNH3SP30_LEFT_INA_GPIO->BRR = VNH3SP30_LEFT_INA;
+    VNH3SP30_LEFT_INB_GPIO->BSRR = VNH3SP30_LEFT_INB;
 
 		left_pwm = -left_pwm;
 	}
@@ -185,32 +226,25 @@ void CMotor::motor_refresh()
   else
   if (right_pwm > 0)
 	{
-    VNH3SP30_RIGHT_INA_GPIO->BRR = VNH3SP30_RIGHT_INA;
-    VNH3SP30_RIGHT_INB_GPIO->BSRR = VNH3SP30_RIGHT_INB;
+    VNH3SP30_RIGHT_INA_GPIO->BSRR = VNH3SP30_RIGHT_INA;
+    VNH3SP30_RIGHT_INB_GPIO->BRR = VNH3SP30_RIGHT_INB;
 	}
 	else
 	{
-    VNH3SP30_RIGHT_INA_GPIO->BSRR = VNH3SP30_RIGHT_INA;
-    VNH3SP30_RIGHT_INB_GPIO->BRR = VNH3SP30_RIGHT_INB;
+    VNH3SP30_RIGHT_INA_GPIO->BRR = VNH3SP30_RIGHT_INA;
+    VNH3SP30_RIGHT_INB_GPIO->BSRR = VNH3SP30_RIGHT_INB;
 
 		right_pwm = -right_pwm;
 	}
 
 
-  //PWM limitation
-	if (left_pwm > SPEED_MAX)
-		left_pwm = SPEED_MAX;
-
-	if (right_pwm > SPEED_MAX)
-		right_pwm = SPEED_MAX;
-
   //invert (because of inverted inputs) pwm and set for both channels
-  pwm_set(SPEED_MAX - right_pwm, SPEED_MAX - left_pwm);
+  pwm_set(SPEED_MAX - left_pwm, SPEED_MAX - right_pwm);
 }
 
 
 
-void CMotor::pwm_set(uint32_t ch1, uint32_t ch2)
+void CMotor::pwm_set(uint32_t left_pwm, uint32_t right_pwm)
 {
     TIM_OCInitTypeDef  TIM_OCInitStructure;
 
@@ -225,9 +259,9 @@ void CMotor::pwm_set(uint32_t ch1, uint32_t ch2)
     TIM_OCInitStructure.TIM_OCNIdleState = TIM_OCIdleState_Reset;
 
 
-    TIM_OCInitStructure.TIM_Pulse = (ch1*(PWM_PERIOD-1))/100;
+    TIM_OCInitStructure.TIM_Pulse = (left_pwm*(PWM_PERIOD-1))/100;
     TIM_OC1Init(TIM1, &TIM_OCInitStructure);
 
-    TIM_OCInitStructure.TIM_Pulse = (ch2*(PWM_PERIOD-1))/100;
+    TIM_OCInitStructure.TIM_Pulse = (right_pwm*(PWM_PERIOD-1))/100;
     TIM_OC2Init(TIM1, &TIM_OCInitStructure);
 }

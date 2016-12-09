@@ -31,8 +31,8 @@ int main()
 
       demo.init();
 
-      demo.run(DEMO_HELLO_WORLD);
-      //demo.run(DEMO_BASIC_LINE_FOLLOWER);
+      //demo.run(DEMO_HELLO_WORLD);
+      demo.run(DEMO_BASIC_LINE_FOLLOWER);
       //demo.run(DEMO_LEARNING_LINE_FOLLOWER);
     }
 

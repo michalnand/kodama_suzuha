@@ -59,27 +59,46 @@ void CDemo::blink_task()
 
 void CDemo::moves_task()
 {
-  kodama.set_motor(MOTOR_LEFT, 20);
-  kodama.set_motor(MOTOR_RIGHT, 0);
-  timer.delay_ms(800);
+  int32_t speed = SPEED_MAX;
 
-  kodama.set_motor(MOTOR_LEFT, -20);
-  kodama.set_motor(MOTOR_RIGHT, 0);
-  timer.delay_ms(800);
+/*
+  while (1)
+  {
+    kodama.set_motors(0, speed);
+    timer.delay_ms(800);
+
+    kodama.set_motors(0, -speed);
+    timer.delay_ms(800);
+  }
+
+  kodama.set_motors(speed, 0);
+  timer.delay_ms(1500);
+
+  kodama.set_motors(-speed, 0);
+  timer.delay_ms(1500);
+
+  kodama.set_motors(0, speed);
+  timer.delay_ms(1500);
+
+  kodama.set_motors(0, -speed);
+  timer.delay_ms(1500);
 
 
-  kodama.set_motor(MOTOR_LEFT, 0);
-  kodama.set_motor(MOTOR_RIGHT, -20);
-  timer.delay_ms(800);
 
-  kodama.set_motor(MOTOR_LEFT, 0);
-  kodama.set_motor(MOTOR_RIGHT, 20);
-  timer.delay_ms(800);
+  kodama.set_motors(speed, -speed);
+  timer.delay_ms(1500);
 
+  kodama.set_motors(-speed, speed);
+  timer.delay_ms(1500);
 
-  kodama.set_motor(MOTOR_LEFT, 0);
-  kodama.set_motor(MOTOR_RIGHT, 0);
+  kodama.set_motors(speed, speed);
+  timer.delay_ms(1500);
 
+  kodama.set_motors(-speed, -speed);
+  timer.delay_ms(1500);
+
+  kodama.set_motors(0, 0);
+*/
 
 /*
   kodama.rotate_robot( 900, SPEED_MAX/2, NULL);
