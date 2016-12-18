@@ -20,6 +20,7 @@ extern "C" {
 #include "gpio/stm32f30x_exti.h"
 #include "uart/stm32f30x_usart.h"
 #include "timer/stm32f30x_tim.h"
+#include "adc/stm32f30x_adc.h"
 
 void lib_low_level_init();
 

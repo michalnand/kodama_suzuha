@@ -3,9 +3,13 @@
 
 #include "usr/demo.h"
 
+#include "kodama/robot_untold_truth/camera.h"
+class CCamera camera;
+
 int main()
 {
   sytem_clock_init();
+
 
   if (kodama.init() != 0)
   {
@@ -16,32 +20,38 @@ int main()
   kodama.sleep();
 
 
-  float number = 3.141592654;
-  kodama.printf("testing number print %u %u %u:\n", sizeof(unsigned int), sizeof(float), sizeof(double));
-  kodama.printf("float number %f \n",  number);
+  i_led.init();
+  i_led.set(I_LED_MODE_BREATH, 1500);
 
-  kodama.printf("%f %f %f %f %f %f %f %f\n",  0.0, 1.0, 0.123456, 3.141592654, 32.7681, 1234.5678, 5.7, 5.72);
-  kodama.printf("%f %f %f %f %f %f %f %f\n", -0.0, -1.0, -0.123456, -3.141592654, -32.7681, -1234.5678, -5.7, -5.72);
+  camera.init();
 
   while (1)
   {
+
     if (kodama.gpio_in(KEY) != 0)
     {
+      i_led.set(I_LED_MODE_BLINKING, 200);
+      timer.delay_ms(200);
+
       kodama.wakeup();
 
       demo.init();
 
-      //demo.run(DEMO_HELLO_WORLD);
-      demo.run(DEMO_BASIC_LINE_FOLLOWER);
+      demo.run(DEMO_HELLO_WORLD);
+      //demo.run(DEMO_BASIC_LINE_FOLLOWER);
       //demo.run(DEMO_LEARNING_LINE_FOLLOWER);
     }
 
-    kodama.gpio_on(LED_0);
-    timer.delay_ms(10);
 
-    kodama.gpio_off(LED_0);
+    camera.read();
+
+    kodama.printf("camera : %i %i \n", (*camera.get()).flag, (*camera.get()).line_position);
+    unsigned int i;
+    for (i = 0; i < LINE_CAMERA_PIXELS_COUNT; i++)
+      kodama.printf("%i ", (*camera.get()).pixels[i]);
+    kodama.printf("\n\n");
+
     timer.delay_ms(300);
-
-    kodama.printf("idle %u\n", timer.get_time());
+    kodama.printf("system idle %u\n", timer.get_time());
   }
 }

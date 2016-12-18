@@ -15,26 +15,33 @@ volatile uint8_t __event_timer_flag__[EVENT_TIMER_COUNT];
 extern "C" {
 #endif
 
-void TIM3_IRQHandler()
+void TIM2_IRQHandler()
 {
-  uint32_t i;
-  for (i = 0; i < EVENT_TIMER_COUNT; i++)
+  if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET)
   {
-     if ((__event_timer_flag__[i] != 0) && (__event_timer_flag__[i] < 255))
-       __event_timer_flag__[i]++;
+    TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 
-     if (__event_timer_cnt__[i])
-       __event_timer_cnt__[i]--;
-     else
-     {
-       __event_timer_cnt__[i] = __event_timer_csr__[i];
-       if (__event_timer_flag__[i] == 0)
-         __event_timer_flag__[i] = 1;
-     }
+    //tick all software timers
+    uint32_t i;
+    for (i = 0; i < EVENT_TIMER_COUNT; i++)
+    {
+      //if sfotware timer have set is flag before, and not cleared yet - let know process to second event ocurs
+       if ((__event_timer_flag__[i] != 0) && (__event_timer_flag__[i] < 255))
+         __event_timer_flag__[i]++;
+
+       if (__event_timer_cnt__[i])
+         __event_timer_cnt__[i]--;
+       else
+       {
+         __event_timer_cnt__[i] = __event_timer_csr__[i];
+         if (__event_timer_flag__[i] == 0)
+           __event_timer_flag__[i] = 1;
+       }
+    }
+
+    //increment global system time
+    __system_time__++;
   }
-
-  __system_time__++;
-  TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
 }
 
 #ifdef __cplusplus
@@ -64,22 +71,22 @@ int32_t CTimer::timer_init()
     __event_timer_flag__[i] = 0;
   }
 
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 
   TIM_TimeBaseInitTypeDef timer_init_struct;
-  timer_init_struct.TIM_Prescaler = 280; //(84 - 1);
+  timer_init_struct.TIM_Prescaler = 720;
   timer_init_struct.TIM_CounterMode = TIM_CounterMode_Up;
-  timer_init_struct.TIM_Period = 50 - 1;
+  timer_init_struct.TIM_Period = 10 - 1;
   timer_init_struct.TIM_ClockDivision = TIM_CKD_DIV1;
   timer_init_struct.TIM_RepetitionCounter = 0;
-  TIM_TimeBaseInit(TIM3, &timer_init_struct);
+  TIM_TimeBaseInit(TIM2, &timer_init_struct);
 
-  TIM_Cmd(TIM3, ENABLE);
+  TIM_Cmd(TIM2, ENABLE);
 
-  TIM3->DIER |= TIM_DIER_UIE; // Enable interrupt on update event
+  TIM2->DIER |= TIM_DIER_UIE; // Enable interrupt on update event
 
   NVIC_InitTypeDef nvicStructure;
-  nvicStructure.NVIC_IRQChannel = TIM3_IRQn;
+  nvicStructure.NVIC_IRQChannel = TIM2_IRQn;
   nvicStructure.NVIC_IRQChannelPreemptionPriority = 0;
   nvicStructure.NVIC_IRQChannelSubPriority = 1;
   nvicStructure.NVIC_IRQChannelCmd = ENABLE;

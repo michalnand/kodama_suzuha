@@ -10,10 +10,12 @@
 #include <timer.h>
 #include <sensors.h>
 #include <motor.h>
+#include <i_led.h>
 
 #include <config.h>
 
 #include "system/rt_timer.h"
+#include "system/dfu_boot.h"
 
 
 #include <controll/vector.h>

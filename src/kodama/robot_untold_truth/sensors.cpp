@@ -25,7 +25,7 @@ int32_t CSensors::sensors_init()
 
   init_res = imu_init();
   if (init_res != 0)
-    return init_res - 2000;
+    return init_res - 5000;
 
   return init_res;
 }
