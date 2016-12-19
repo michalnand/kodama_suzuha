@@ -119,7 +119,7 @@ int CTerminal::getchar()
 {
   int res;
 
-	while( (res = ischar()) == 0xffff )
+	while( (res = ischar()) == NO_CHAR )
 		__asm("nop");
 
   return res;
@@ -130,7 +130,7 @@ int CTerminal::ischar()
   int res = 0;
 
   if (g_uart_rd_ptr == g_uart_wr_ptr)
-    res = 0xffff;
+    res = NO_CHAR;
   else
   {
     res = g_uart_rx_buffer[g_uart_rd_ptr];
@@ -240,7 +240,7 @@ void CTerminal::putx(uint32_t n)
 	ptr++;
  	puts(s + ptr);
 }
- 
+
 
 void CTerminal::putf(float n, unsigned int decimal_places)
 {

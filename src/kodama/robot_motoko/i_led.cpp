@@ -12,7 +12,7 @@
 class CILED i_led;
 
 volatile uint32_t g_iled_mode;
-volatile uint32_t g_iled_param;
+volatile uint32_t g_iled_param; 
 volatile uint32_t g_iled_time;
 volatile uint8_t  g_iled_state;
 

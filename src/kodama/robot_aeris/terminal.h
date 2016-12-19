@@ -11,6 +11,8 @@ class CTerminal:public CTerminalInterface
     CTerminal();
     ~CTerminal();
 
+    void clear_buffer();
+
     int32_t terminal_init();
 
     void putchar(char c);

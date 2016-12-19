@@ -8,7 +8,7 @@
 #define DRV8830_CONTROL_REG		 0x00
 #define DRV8830_FAULT_REG			 0x01
 
- 
+
 CMotor::CMotor()
 {
   motor_init();
@@ -43,6 +43,14 @@ void CMotor::set_motor(uint32_t motor_id, int32_t value)
 {
   if (motor_id < MOTORS_COUNT)
     motors[motor_id] = value;
+
+  motor_refresh();
+}
+
+void CMotor::set_motors(int32_t left_motor, int32_t right_motor)
+{
+  motors[MOTOR_LEFT] = left_motor;
+  motors[MOTOR_RIGHT] = right_motor;
 
   motor_refresh();
 }

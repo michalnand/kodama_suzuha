@@ -12,11 +12,12 @@
 #include <motor.h>
 #include <i_led.h>
 
+
 #include <config.h>
 
 #include "system/rt_timer.h"
 #include "system/dfu_boot.h"
-
+#include "system/uniqueid.h"
 
 #include <controll/vector.h>
 #include <controll/math_vector.h>
@@ -27,11 +28,13 @@
 #include <controll/reinforcement_learning.h>
 #include <controll/line_position.h>
 
+#include <comm/wifi.h>
+
 #ifndef NULL
 #define NULL  0
 #endif
 
-class CKodama: public CGPIO, public CError, public CTerminal, public CSensors, public CMotor
+class CKodama: public CGPIO, public CError, public CTerminal, public CSensors, public CMotor, public CUniqueID
 {
   private:
     int32_t ms_dt;

@@ -123,6 +123,14 @@ void CMotor::set_motor(uint32_t motor_id, int32_t value)
   motor_refresh();
 }
 
+void CMotor::set_motors(int32_t left_motor, int32_t right_motor)
+{
+  motors[MOTOR_LEFT] = left_motor;
+  motors[MOTOR_RIGHT] = right_motor;
+
+  motor_refresh();
+}
+
 void CMotor::motor_sleep()
 {
 

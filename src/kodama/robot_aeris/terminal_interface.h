@@ -1,6 +1,8 @@
 #ifndef _TERMINAL_INTERFACE_H_
 #define _TERMINAL_INTERFACE_H_
 
+#define NO_CHAR       0xffff
+
 class CTerminalInterface
 {
   public:
@@ -39,7 +41,7 @@ class CTerminalInterface
     //else return 0xffff if thesere is no char in receive buffer
     int ischar()
     {
-      return 0xffff;
+      return NO_CHAR;
     }
 
     //print zero terminated ('\0') string to stdout
