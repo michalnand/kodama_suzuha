@@ -1,8 +1,6 @@
 #include "line_position.h"
 
-
-
-
+ 
 CLinePosition::CLinePosition()
 {
   line_position = 0.0;

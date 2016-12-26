@@ -8,9 +8,9 @@
 #include <terminal.h>
 
 #include <timer.h>
-#include <sensors.h>
 #include <motor.h>
 #include <i_led.h>
+#include <devices.h>
 
 
 #include <config.h>
@@ -26,19 +26,42 @@
 
 #include <controll/associative_memory.h>
 #include <controll/reinforcement_learning.h>
-#include <controll/line_position.h>
 
-#include <comm/wifi.h>
+#ifdef USE_RGB
+#include <rgb.h>
+#endif
 
 #ifndef NULL
 #define NULL  0
 #endif
 
-class CKodama: public CGPIO, public CError, public CTerminal, public CSensors, public CMotor, public CUniqueID
+class CKodama: public CGPIO, public CError, public CTerminal, public CMotor, public CUniqueID
+#ifdef USE_RGB
+, public CRGB
+#endif
+
+#ifdef USE_IMU
+, public CIMU
+#endif
+
+#ifdef USE_CAMERA
+, public CCamera
+#endif
+
+#ifdef USE_OLED_LCD
+, public CSSD1306OLED
+#endif
+
+#ifdef USE_VL530X
+, public CVL53L0X
+#endif
 {
   private:
     int32_t ms_dt;
     uint32_t motor_value[MOTORS_COUNT];
+
+  public:
+    class CI2C i2c;
 
   public:
     CKodama();
@@ -51,15 +74,6 @@ class CKodama: public CGPIO, public CError, public CTerminal, public CSensors, p
     void wakeup();
 
     void set_dt(int32_t ms_dt_);
-
-
-    int32_t sensor_get(uint32_t sensor_id);
-
-
-    void sensor_read();
-
-    int32_t comm_send( unsigned char *tx_buffer, uint32_t tx_buffer_length,
-                               unsigned char *rx_buffer, uint32_t rx_buffer_length);
 
 
    void rotate_robot(int32_t angle, int32_t speed, int32_t (*terminating_func)() = NULL);

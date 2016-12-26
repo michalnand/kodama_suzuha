@@ -1,7 +1,6 @@
 #include "imu.h"
 #include "lsm9ds0_regs.h"
-#include "i2c.h"
-#include "../controll/math.h"
+#include <i2c.h>
 
 CIMU::CIMU()
 {
@@ -13,9 +12,11 @@ CIMU::~CIMU()
 
 }
 
-int32_t CIMU::imu_init()
+int CIMU::imu_init(class CI2C *i2c_)
 {
   uint8_t tmp;
+
+  i2c = i2c_;
 
   imu_ms_dt = 10;
 
@@ -33,49 +34,49 @@ int32_t CIMU::imu_init()
     __asm("nop");
 
   //check gyro who am I register
-  tmp = i2c.read_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_WHO_AM_I_G);
+  tmp = i2c->read_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_WHO_AM_I_G);
   if ( tmp != ((1<<7)|(1<<6)|(1<<4)|(1<<2)) )
       return -1;
 
   //check magnetometer and accelerometer who am I register
-  tmp = i2c.read_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_WHO_AM_I_XM);
+  tmp = i2c->read_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_WHO_AM_I_XM);
   if (tmp != ((1<<6)|(1<<3)|(1<<0)) )
       return -2;
 
 
   //gyrosocpe init
   //enable all axis, power up, maximum data output rate - 100Hz
-  i2c.write_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_CTRL_REG1_G, (1<<7)|(1<<6)|(1<<5)|(1<<4)|
+  i2c->write_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_CTRL_REG1_G, (1<<7)|(1<<6)|(1<<5)|(1<<4)|
                                                           (1<<3)|(1<<2)|(1<<1)|(1<<0));
 
   //2000DPS range
   //i2c_write_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_CTRL_REG4_G, (1<<5));
 
   //500DPS range
-  i2c.write_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_CTRL_REG4_G, (1<<4));
+  i2c->write_reg(LSM9DS0_GYRO_ADDRESS, LSM9DS0_CTRL_REG4_G, (1<<4));
 
 
   //accelerometer init
-  i2c.write_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_CTRL_REG0_XM, 0);
+  i2c->write_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_CTRL_REG0_XM, 0);
 
   //enable all axis, data rate 100Hz
-  i2c.write_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_CTRL_REG1_XM, (1<<6)|(1<<5)|(1<<2)|(1<<1)|(1<<0));
+  i2c->write_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_CTRL_REG1_XM, (1<<6)|(1<<5)|(1<<2)|(1<<1)|(1<<0));
 
   //2g full range
-  i2c.write_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_CTRL_REG2_XM, 0);
+  i2c->write_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_CTRL_REG2_XM, 0);
 
 
 
 /*
   //magnetometer init
   // enable temperature sensor, high resolution, 100Hz outout rate
-  i2c.write_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_CTRL_REG5_XM, (1<<7)|(1<<6)|(1<<5)|(1<<4)|(1<<2));
+  i2c->write_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_CTRL_REG5_XM, (1<<7)|(1<<6)|(1<<5)|(1<<4)|(1<<2));
 
   //2 guass range
-  i2c.write_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_CTRL_REG6_XM, 0);
+  i2c->write_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_CTRL_REG6_XM, 0);
 
   //continuous normal mode
-  i2c.write_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_CTRL_REG7_XM, 1<<7);
+  i2c->write_reg(LSM9DS0_ACC_MAG_ADDRESS, LSM9DS0_CTRL_REG7_XM, 1<<7);
 */
 
   loops = 100000;
@@ -129,48 +130,48 @@ void CIMU::imu_read()
   int16_t tmp;
 
 
-  i2c.Start();
-  i2c.Write(LSM9DS0_GYRO_ADDRESS);  // slave address, write command
-  i2c.Write(LSM9DS0_OUT_X_L_G|0x80);  // send reg address, auto increment address
+  i2c->Start();
+  i2c->Write(LSM9DS0_GYRO_ADDRESS);  // slave address, write command
+  i2c->Write(LSM9DS0_OUT_X_L_G|0x80);  // send reg address, auto increment address
 
-  i2c.Start();
-  i2c.Write(LSM9DS0_GYRO_ADDRESS|0x01); // slave address, read command
+  i2c->Start();
+  i2c->Write(LSM9DS0_GYRO_ADDRESS|0x01); // slave address, read command
 
-  tmp = (uint16_t)i2c.Read(1);   //read data
-  tmp|= ((uint16_t)i2c.Read(1))<<8;   //read data
+  tmp = (uint16_t)i2c->Read(1);   //read data
+  tmp|= ((uint16_t)i2c->Read(1))<<8;   //read data
   imu_result.gx = tmp;
 
-  tmp = (uint16_t)i2c.Read(1);   //read data
-  tmp|= ((uint16_t)i2c.Read(1))<<8;   //read data
+  tmp = (uint16_t)i2c->Read(1);   //read data
+  tmp|= ((uint16_t)i2c->Read(1))<<8;   //read data
   imu_result.gy = tmp;
 
-  tmp = (uint16_t)i2c.Read(1);   //read data
-  tmp|= ((uint16_t)i2c.Read(0))<<8;   //read data
+  tmp = (uint16_t)i2c->Read(1);   //read data
+  tmp|= ((uint16_t)i2c->Read(0))<<8;   //read data
   imu_result.gz = tmp;
 
-  i2c.Stop();
+  i2c->Stop();
 
 
-  i2c.Start();
-  i2c.Write(LSM9DS0_ACC_MAG_ADDRESS);  // slave address, write command
-  i2c.Write(LSM9DS0_OUT_X_L_A|0x80);  // send reg address, auto increment address
+  i2c->Start();
+  i2c->Write(LSM9DS0_ACC_MAG_ADDRESS);  // slave address, write command
+  i2c->Write(LSM9DS0_OUT_X_L_A|0x80);  // send reg address, auto increment address
 
-  i2c.Start();
-  i2c.Write(LSM9DS0_ACC_MAG_ADDRESS|0x01); // slave address, read command
+  i2c->Start();
+  i2c->Write(LSM9DS0_ACC_MAG_ADDRESS|0x01); // slave address, read command
 
-  tmp = (uint16_t)i2c.Read(1);   //read data
-  tmp|= ((uint16_t)i2c.Read(1))<<8;   //read data
+  tmp = (uint16_t)i2c->Read(1);   //read data
+  tmp|= ((uint16_t)i2c->Read(1))<<8;   //read data
   imu_result.ax = tmp;
 
-  tmp = (uint16_t)i2c.Read(1);   //read data
-  tmp|= ((uint16_t)i2c.Read(1))<<8;   //read data
+  tmp = (uint16_t)i2c->Read(1);   //read data
+  tmp|= ((uint16_t)i2c->Read(1))<<8;   //read data
   imu_result.ay = tmp;
 
-  tmp = (uint16_t)i2c.Read(1);   //read data
-  tmp|= ((uint16_t)i2c.Read(0))<<8;   //read data
+  tmp = (uint16_t)i2c->Read(1);   //read data
+  tmp|= ((uint16_t)i2c->Read(0))<<8;   //read data
   imu_result.az = tmp;
 
-  i2c.Stop();
+  i2c->Stop();
 
   roll+= -((int32_t)imu_result.gy - gy_ofs)/(int32_t)200;
   imu_result.roll = (imu_ms_dt*100*roll)/2530;
@@ -184,7 +185,7 @@ void CIMU::imu_read()
   imu_result.yaw = (imu_ms_dt*100*yaw)/2530;
 }
 
-struct sIMUSensor* CIMU::get_imu_result()
+struct sIMUSensor* CIMU::imu_get()
 {
   return &imu_result;
 }

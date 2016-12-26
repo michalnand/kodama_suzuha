@@ -2,6 +2,8 @@
 #define _MOTORS_H_
 
 #include <stdint.h>
+#include "i2c.h"
+
 
 #define SPEED_MAX      (int32_t)44
 
@@ -15,11 +17,13 @@ class CMotor
 {
   private:
     uint32_t motors[MOTORS_COUNT];
+    class CI2C *i2c;
 
   public:
     CMotor();
     ~CMotor();
 
+    void motor_set_i2c(class CI2C *i2c_);
     int32_t motor_init();
 
     void motor_sleep();

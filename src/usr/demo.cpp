@@ -108,6 +108,7 @@ void CDemo::moves_task()
 
 void CDemo::basic_line_follower_task()
 {
+  #ifdef USE_RGB
   CLinePosition line_position;
   class CPID pid(10.0, 0.0, 8.0, SPEED_MAX);
 
@@ -119,7 +120,7 @@ void CDemo::basic_line_follower_task()
       continue;
 
     kodama.rgb_read();
-    line_position.process(kodama.get_rgb_result());
+    line_position.process(kodama.rgb_get());
 
     kodama.printf("%i %i \n", line_position.on_line(), (int)(1000*line_position.get_line_position()));
 
@@ -142,4 +143,5 @@ void CDemo::basic_line_follower_task()
       timer.delay_ms(100);
     }
   }
+  #endif
 }

@@ -27,7 +27,12 @@ class CI2C
     uint8_t Read(uint8_t  ack);
 
     void write_reg(uint8_t dev_adr, uint8_t reg_adr, uint8_t value);
+    void write_reg_16bit(uint8_t dev_adr, uint8_t reg_adr, uint16_t value);
+    void write_reg_multi(uint8_t dev_adr, uint8_t reg_adr, unsigned char *data, unsigned int count);
+
     uint8_t read_reg(uint8_t dev_adr, uint8_t reg_adr);
+    uint16_t read_reg_16bit(uint8_t dev_adr, uint8_t reg_adr);
+    void read_reg_multi(uint8_t dev_adr, uint8_t reg_adr, unsigned char *data, unsigned int count);
 
   private:
     void delay();

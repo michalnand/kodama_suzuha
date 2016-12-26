@@ -13,7 +13,7 @@ CCamera::~CCamera()
 
 }
 
-void CCamera::init()
+void CCamera::camera_init()
 {
 		g_camera.state = 0;
 		g_camera.flag = 0;
@@ -91,12 +91,12 @@ void CCamera::init()
 		NVIC_Init(&nvicStructure);
 }
 
-struct sLineCamera* CCamera::get()
+struct sLineCamera* CCamera::camera_get()
 {
 	return &g_camera;
 }
 
-uint32_t CCamera::read()
+uint32_t CCamera::camera_read()
 {
 	unsigned int i;
 

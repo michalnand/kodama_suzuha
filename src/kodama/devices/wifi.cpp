@@ -20,9 +20,10 @@ CWifi::~CWifi()
 }
 
 //init wifi module and return WIFI_SUCCESS or WIFI+ERROR
-int CWifi::init(unsigned char mode_)
+int CWifi::wifi_init(unsigned char mode_)
 {
   mode = mode_;
+
   i_led.set(I_LED_MODE_BLINKING, 100);
   int result = esp8266_init();
   if (result == WIFI_SUCCESS)
@@ -34,7 +35,7 @@ int CWifi::init(unsigned char mode_)
 
 //connect to server with specified IP, send tx_buffer with tx_buffer_length;
 //and receive data from server into rx_buffer with maximum length rx_buffer_length
-int CWifi::connect(char *ip, unsigned int port, char *tx_buffer, unsigned int tx_buffer_length, char *rx_buffer, unsigned int rx_buffer_length)
+int CWifi::wifi_connect(char *ip, unsigned int port, char *tx_buffer, unsigned int tx_buffer_length, char *rx_buffer, unsigned int rx_buffer_length)
 {
   unsigned int i;
   for (i = 0; i < rx_buffer_length; i++)
@@ -103,7 +104,7 @@ int CWifi::connect(char *ip, unsigned int port, char *tx_buffer, unsigned int tx
 	return (count);
 }
 
-int CWifi::connect_send_data(unsigned int packet_type, unsigned char *data, unsigned int packet_size)
+int CWifi::wifi_connect_send_data(unsigned int packet_type, unsigned char *data, unsigned int packet_size)
 {
   struct sWifiPacket tmp_packet;
 
@@ -117,13 +118,13 @@ int CWifi::connect_send_data(unsigned int packet_type, unsigned char *data, unsi
   for (i = 0; i < packet_size; i++)
     tmp_packet.data[i] = data[i];
 
-  connect(const_cast<char*>(WIFI_SERVER_IP), WIFI_SERVER_PORT,
+  wifi_connect(const_cast<char*>(WIFI_SERVER_IP), WIFI_SERVER_PORT,
           (char*)(&tmp_packet), sizeof(tmp_packet),
           NULL, 0);
   return 0;
 }
 
-void CWifi::client_demo()
+void CWifi::wifi_client_demo()
 {
 	while (1)
 	{
@@ -134,8 +135,8 @@ void CWifi::client_demo()
     state.action = 314159;
 
     kodama.gpio_on(LED_0);
-    connect_send_data(WIFI_PACKET_TYPE_STATE, (unsigned char*)&state, sizeof(struct sWifiData_State));
-    connect_send_data(WIFI_PACKET_TYPE_STATE, (unsigned char*)&state, sizeof(struct sWifiData_State));
+    wifi_connect_send_data(WIFI_PACKET_TYPE_STATE, (unsigned char*)&state, sizeof(struct sWifiData_State));
+    wifi_connect_send_data(WIFI_PACKET_TYPE_STATE, (unsigned char*)&state, sizeof(struct sWifiData_State));
     kodama.gpio_off(LED_0);
 
 		timer.delay_ms(100);
@@ -143,7 +144,7 @@ void CWifi::client_demo()
 }
 
 //start web server main loop
-int CWifi::web_server_loop(char *page_ptr, unsigned int page_size)
+int CWifi::wifi_web_server_loop(char *page_ptr, unsigned int page_size)
 {
   (void)page_ptr;
   (void)page_size;

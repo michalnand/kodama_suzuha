@@ -20,10 +20,10 @@ class CRGB: public CRGB_I2C
     CRGB();
     ~CRGB();
 
-    int32_t rgb_init();
+    int rgb_init();
 
     void rgb_read(unsigned char calibration = 0);
-    struct sRGBResult *get_rgb_result();
+    struct sRGBResult *rgb_get();
 };
 
 #endif

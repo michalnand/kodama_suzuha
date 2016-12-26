@@ -1,8 +1,6 @@
 #ifndef _WIFI_H_
 #define _WIFI_H_
 
-//TODO this module is not tested yet !!!!!!!!!!!!!!
-
 
 #define WIFI_SUCCESS                   ((int)0)
 #define WIFI_RESET_ERROR               ((int)-1)
@@ -19,7 +17,8 @@
 #define WIFI_MODE_CLIENT      ((unsigned char )0)
 #define WIFI_MODE_SERVER      ((unsigned char )1)
 
-#include "kodama.h"
+#include <kodama.h>
+
 
 
 class CWifi
@@ -33,18 +32,18 @@ class CWifi
     ~CWifi();
 
     //init wifi module and return WIFI_SUCCESS or WIFI+ERROR
-    int init(unsigned char mode_);
+    int wifi_init(unsigned char mode_);
 
     //connect to server with specified IP, send tx_buffer with tx_buffer_length;
     //and receive data from server into rx_buffer with maximum length rx_buffer_length
-    int connect(char *ip, unsigned int port, char *tx_buffer, unsigned int tx_buffer_length, char *rx_buffer, unsigned int rx_buffer_length);
+    int wifi_connect(char *ip, unsigned int port, char *tx_buffer, unsigned int tx_buffer_length, char *rx_buffer, unsigned int rx_buffer_length);
 
-    int connect_send_data(unsigned int packet_type, unsigned char *data, unsigned int packet_size);
+    int wifi_connect_send_data(unsigned int packet_type, unsigned char *data, unsigned int packet_size);
 
-    void client_demo();
+    void wifi_client_demo();
 
     //start web server main loop
-    int web_server_loop(char *page_ptr, unsigned int page_size);
+    int wifi_web_server_loop(char *page_ptr, unsigned int page_size);
 
   private:
     void esp8266_send(char *buf);

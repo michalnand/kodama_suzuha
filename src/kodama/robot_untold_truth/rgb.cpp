@@ -1,8 +1,6 @@
 #include "rgb.h"
 #include <device.h>
 
-
-
 CRGB::CRGB()
 {
 
@@ -15,7 +13,7 @@ CRGB::~CRGB()
 
 }
 
-int32_t CRGB::rgb_init()
+int CRGB::rgb_init()
 {
   unsigned int i;
 
@@ -137,7 +135,7 @@ void CRGB::rgb_read(unsigned char calibration)
 	rgb_i2cRead(1, rgb_raw);
 	for (i = 0; i < RGB_SENSORS_COUNT; i++)
 		rgb_result.g[i]|= ((uint16_t)rgb_raw[i])<<8;
- 
+
 	rgb_i2cRead(1, rgb_raw);
 	for (i = 0; i < RGB_SENSORS_COUNT; i++)
 		rgb_result.b[i] = rgb_raw[i];
@@ -200,7 +198,7 @@ void CRGB::rgb_read(unsigned char calibration)
   }
 }
 
-struct sRGBResult *CRGB::get_rgb_result()
+struct sRGBResult *CRGB::rgb_get()
 {
   return &rgb_result;
 }

@@ -1,7 +1,7 @@
 #ifndef _IMU_H_
 #define _IMU_H_
 
-#include "i2c.h"
+#include <i2c.h>
 
 struct sIMUSensor
 {
@@ -13,6 +13,8 @@ struct sIMUSensor
 class CIMU
 {
   private:
+    class CI2C *i2c;
+
     int32_t gx_ofs, gy_ofs, gz_ofs;
     int32_t roll, pitch, yaw;
 
@@ -25,10 +27,10 @@ class CIMU
     CIMU();
     ~CIMU();
 
-    int32_t imu_init();
+    int imu_init(class CI2C *i2c_);
     void imu_read();
 
-    struct sIMUSensor* get_imu_result();
+    struct sIMUSensor* imu_get();
 };
 
 #endif

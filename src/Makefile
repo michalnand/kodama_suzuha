@@ -5,20 +5,20 @@ SRCS+= $(shell find suzuha/ -name '*.c')
 CXX_SRCS = kodama/kodama.cpp
 CXX_SRCS+= $(shell find kodama/system/ -name '*.cpp')
 CXX_SRCS+= $(shell find kodama/controll/ -name '*.cpp')
-CXX_SRCS+= $(shell find kodama/comm/ -name '*.cpp')
-CXX_SRCS+= $(shell find kodama/robot_aeris/ -name '*.cpp')
+CXX_SRCS+= $(shell find kodama/devices/ -name '*.cpp')
+CXX_SRCS+= $(shell find kodama/robot_motoko/ -name '*.cpp')
 CXX_SRCS+= $(shell find usr/ -name '*.cpp')
 
 
 INC = -I"./device/"
 INC+= -I"./device/stm32f30x/"
 INC+= -I"./suzuha/"
-INC+= -I"./kodama/robot_aeris/"
+INC+= -I"./kodama/robot_motoko/"
 
 INC+= -I"./kodama/"
 INC+= -I"./kodama/system/"
 INC+= -I"./kodama/controll/"
-INC+= -I"./kodama/comm/"
+INC+= -I"./kodama/devices/"
 
 
 TARGET = -mcpu=cortex-m4 -mthumb  -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fsingle-precision-constant

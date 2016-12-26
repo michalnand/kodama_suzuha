@@ -6,7 +6,7 @@
 #define HARD_LOCATIONS_COUNT  ((uint32_t)32)
 
 #include <kodama.h>
-
+#include "line_position.h"
 
 class CLearningLineFollower
 {

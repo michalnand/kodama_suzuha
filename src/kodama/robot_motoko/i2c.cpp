@@ -161,6 +161,28 @@ void CI2C::write_reg(uint8_t dev_adr, uint8_t reg_adr, uint8_t value)
     Stop();
 }
 
+void CI2C::write_reg_16bit(uint8_t dev_adr, uint8_t reg_adr, uint16_t value)
+{
+  Start();
+  Write(dev_adr);  /*slave address, write command*/
+  Write(reg_adr);  /*send reg address*/
+  Write((value >> 8) & 0xFF);
+  Write(value  & 0xFF);
+  Stop();
+}
+
+void CI2C::write_reg_multi(uint8_t dev_adr, uint8_t reg_adr, unsigned char *data, unsigned int count)
+{
+  unsigned int i;
+  Start();
+  Write(dev_adr);  /*slave address, write command*/
+  Write(reg_adr);  /*send reg address*/
+  for (i = 0; i < count; i++)
+    Write(data[i]);
+  Stop();
+}
+
+
 uint8_t CI2C::read_reg(uint8_t dev_adr, uint8_t reg_adr)
 {
     uint8_t res;
@@ -177,6 +199,38 @@ uint8_t CI2C::read_reg(uint8_t dev_adr, uint8_t reg_adr)
     return res;
 }
 
+uint16_t CI2C::read_reg_16bit(uint8_t dev_adr, uint8_t reg_adr)
+{
+  uint16_t result;
+
+
+  Start();
+  Write(dev_adr);  /*slave address, write command*/
+  Write(reg_adr);  /*send reg address*/
+
+  Start();
+  Write(dev_adr|0x01); /*slave address, read command*/
+  result = ((uint16_t)Read(1))<<8;   /*read data*/
+  result|= ((uint16_t)Read(0));
+  Stop();
+
+  return result;
+}
+
+void CI2C::read_reg_multi(uint8_t dev_adr, uint8_t reg_adr, unsigned char *data, unsigned int count)
+{
+  unsigned int i;
+
+  Start();
+  Write(dev_adr);  /*slave address, write command*/
+  Write(reg_adr);  /*send reg address*/
+
+  Start();
+  Write(dev_adr|0x01); /*slave address, read command*/
+  for (i = 0; i < count; i++)
+    data[i] = Read(1);   /*read data*/
+  Stop();
+}
 
 
 void CI2C::delay()

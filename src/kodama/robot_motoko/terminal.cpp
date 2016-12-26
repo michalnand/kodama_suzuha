@@ -19,14 +19,8 @@ CTerminal::CTerminal()
 
 int32_t CTerminal::terminal_init()
 {
-  unsigned int i;
-
-  g_uart_wr_ptr = 0;
-  g_uart_rd_ptr = 0;
-
-  for (i = 0; i < UART_RX_BUFFER_SIZE; i++)
-    g_uart_rx_buffer[i] = '\0';
-
+  clear_buffer();
+  
     GPIO_InitTypeDef  GPIO_InitStructure;
   	USART_InitTypeDef USART_InitStructure;
 
@@ -80,6 +74,17 @@ CTerminal::~CTerminal()
 {
 
 
+}
+
+void CTerminal::clear_buffer()
+{
+  unsigned int i;
+
+  g_uart_wr_ptr = 0;
+  g_uart_rd_ptr = 0;
+
+  for (i = 0; i < UART_RX_BUFFER_SIZE; i++)
+    g_uart_rx_buffer[i] = '\0';
 }
 
 

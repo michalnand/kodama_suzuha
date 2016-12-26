@@ -9,7 +9,7 @@ struct sRGBResult
   int16_t ambient[RGB_SENSORS_COUNT], proximity[RGB_SENSORS_COUNT];
   int16_t r_normalised[RGB_SENSORS_COUNT], g_normalised[RGB_SENSORS_COUNT], b_normalised[RGB_SENSORS_COUNT];
 };
- 
+
 class CRGB: public CRGB_I2C
 {
   private:
@@ -23,7 +23,7 @@ class CRGB: public CRGB_I2C
     int32_t rgb_init();
 
     void rgb_read(unsigned char calibration = 0);
-    struct sRGBResult *get_rgb_result();
+    struct sRGBResult *rgb_get();
 };
 
 #endif

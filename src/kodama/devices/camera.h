@@ -30,10 +30,10 @@ class CCamera
     CCamera();
     ~CCamera();
 
-    void init();
+    void camera_init();
 
-    struct sLineCamera* get();
-    uint32_t read();
+    struct sLineCamera* camera_get();
+    uint32_t camera_read();
 
 };
 

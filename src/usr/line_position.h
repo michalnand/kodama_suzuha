@@ -1,7 +1,9 @@
 #ifndef _LINE_POSITION_H_
 #define _LINE_POSITION_H_
 
-#include "../kodama.h"
+#include <kodama.h>
+#include <rgb.h>
+
 
 class CLinePosition
 {
@@ -20,5 +22,6 @@ class CLinePosition
     float get_line_position();
     void get_vector(class MathVector<RGB_SENSORS_COUNT> *v);
 };
+
 
 #endif

@@ -1,6 +1,5 @@
 #include "motor.h"
 
-#include "i2c.h"
 
 #define DRV8830_LEFT_ADDRESS		0xC0
 #define DRV8830_RIGHT_ADDRESS	 0xC2
@@ -11,7 +10,7 @@
 
 CMotor::CMotor()
 {
-  motor_init();
+
 }
 
 CMotor::~CMotor()
@@ -23,8 +22,13 @@ CMotor::~CMotor()
 void CMotor::motor_sleep()
 {
   unsigned char tmp = (6<<2);
-  i2c.write_reg(DRV8830_LEFT_ADDRESS, DRV8830_CONTROL_REG, tmp);
-  i2c.write_reg(DRV8830_RIGHT_ADDRESS, DRV8830_CONTROL_REG, tmp);
+  i2c->write_reg(DRV8830_LEFT_ADDRESS, DRV8830_CONTROL_REG, tmp);
+  i2c->write_reg(DRV8830_RIGHT_ADDRESS, DRV8830_CONTROL_REG, tmp);
+}
+
+void CMotor::motor_set_i2c(class CI2C *i2c_)
+{
+  i2c = i2c_;
 }
 
 int32_t CMotor::motor_init()
@@ -100,8 +104,8 @@ void CMotor::motor_refresh()
 		}
 	}
 
-	i2c.write_reg(DRV8830_LEFT_ADDRESS, DRV8830_CONTROL_REG, 0);
-	i2c.write_reg(DRV8830_LEFT_ADDRESS, DRV8830_CONTROL_REG, tmp);
+	i2c->write_reg(DRV8830_LEFT_ADDRESS, DRV8830_CONTROL_REG, 0);
+	i2c->write_reg(DRV8830_LEFT_ADDRESS, DRV8830_CONTROL_REG, tmp);
 
 
 	if (tmp_right == 0)
@@ -125,7 +129,7 @@ void CMotor::motor_refresh()
 		tmp = (tmp_right<<2)|(1<<1); //set speed and way
 	}
 
-	i2c.write_reg(DRV8830_RIGHT_ADDRESS, DRV8830_CONTROL_REG, 0);
-	i2c.write_reg(DRV8830_RIGHT_ADDRESS, DRV8830_CONTROL_REG, tmp);
+	i2c->write_reg(DRV8830_RIGHT_ADDRESS, DRV8830_CONTROL_REG, 0);
+	i2c->write_reg(DRV8830_RIGHT_ADDRESS, DRV8830_CONTROL_REG, tmp);
 
 }

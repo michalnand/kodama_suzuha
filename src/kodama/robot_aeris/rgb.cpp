@@ -200,7 +200,7 @@ void CRGB::rgb_read(unsigned char calibration)
   }
 }
 
-struct sRGBResult *CRGB::get_rgb_result()
+struct sRGBResult *CRGB::rgb_get()
 {
   return &rgb_result;
 }

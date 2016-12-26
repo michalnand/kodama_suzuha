@@ -14,6 +14,7 @@ CLearningLineFollower::~CLearningLineFollower()
 
 void CLearningLineFollower::run()
 {
+  #ifdef _USE_RGB_
   rl.init();
 
   float score = -1.0;
@@ -23,7 +24,7 @@ void CLearningLineFollower::run()
     //obtain state -> read sensors and fill state vector
     kodama.rgb_read();
 
-    line_position.process(kodama.get_rgb_result());
+    line_position.process(kodama.rgb_get());
     line_position.get_vector(&state);
     //state.add(line_position.get_line_position());
 
@@ -53,7 +54,7 @@ void CLearningLineFollower::run()
 
     //obatain reward from current line position
     kodama.rgb_read();
-    line_position.process(kodama.get_rgb_result());
+    line_position.process(kodama.rgb_get());
 
     //just normalise reward into <-0.5 .. 0.5>
     float reward = (1.0 - math.abs(line_position.get_line_position())) - 0.5;
@@ -79,4 +80,5 @@ void CLearningLineFollower::run()
     //TODO printf with %f
     kodama.printf("%i \n", (int)(1000*score));
   }
+  #endif
 }

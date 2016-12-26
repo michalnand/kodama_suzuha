@@ -1,5 +1,6 @@
 #include "kodama.h"
 
+
 class CKodama kodama;
 
 CKodama::CKodama()
@@ -43,6 +44,8 @@ int32_t CKodama::init_()
     return -10000 + init_res;
   #endif
 
+  i2c.init();
+
 
   #ifdef _TERMINAL_H_
   if ((init_res = terminal_init()) < 0)
@@ -56,14 +59,35 @@ int32_t CKodama::init_()
 
   #ifdef _MOTORS_H_
   if ((init_res = motor_init()) < 0)
+    return -40000 + init_res;
+  #endif
+
+
+  #ifdef USE_RGB
+  if ((init_res = rgb_init()) < 0)
     return -50000 + init_res;
   #endif
 
+  #ifdef USE_IMU
+  if ((init_res = imu_init(&i2c)) < 0)
+    return -60000 + init_res;
+  #endif 
 
-  #ifdef _SENSORS_H_
-  if ((init_res = sensors_init()) < 0)
-    return -40000 + init_res;
+  #ifdef USE_CAMERA
+  camera_init();
   #endif
+
+  #ifdef USE_OLED_LCD
+  if ((init_res = oled_lcd_init(&i2c)) < 0)
+    return -70000 + init_res;
+  #endif
+
+  #ifdef USE_VL530X
+  if ((init_res = laser_init(&i2c)) < 0)
+    return -80000 + init_res;
+  #endif
+
+
 
 
   return init_res;
@@ -96,39 +120,17 @@ void CKodama::set_dt(int32_t ms_dt_)
 }
 
 
-int32_t CKodama::sensor_get(uint32_t sensor_id)
-{
-  (void)sensor_id;
-  return 0;
-}
-
-
-void CKodama::sensor_read()
-{
-
-}
-
-int32_t CKodama::comm_send( unsigned char *tx_buffer, uint32_t tx_buffer_length,
-                           unsigned char *rx_buffer, uint32_t rx_buffer_length)
-{
-  (void)tx_buffer;
-  (void)tx_buffer_length;
-  (void)rx_buffer;
-  (void)rx_buffer_length;
-
-  return 0;
-}
-
 
 void CKodama::rotate_robot(int32_t angle, int32_t speed, int32_t (*terminating_func)())
 {
+  #ifdef USE_IMU
 
   imu_read();
 
-  int32_t required_angle = angle + get_imu_result()->yaw;
+  int32_t required_angle = angle + imu_get()->yaw;
   int32_t dif_speed = 0;
 
-  int32_t tmp, error;
+  int32_t tmp, error_value;
 
   while (1)
   {
@@ -139,11 +141,11 @@ void CKodama::rotate_robot(int32_t angle, int32_t speed, int32_t (*terminating_f
           break;
 
       imu_read();
-      error = required_angle - get_imu_result()->yaw;
+      error_value = required_angle - imu_get()->yaw;
 
       int32_t sgn;
 
-      if (error > 0)
+      if (error_value > 0)
         sgn = 1;
       else
         sgn = -1;
@@ -154,7 +156,7 @@ void CKodama::rotate_robot(int32_t angle, int32_t speed, int32_t (*terminating_f
       set_motor(MOTOR_LEFT, dif_speed*sgn);
       set_motor(MOTOR_RIGHT, -dif_speed*sgn);
 
-      tmp = error;
+      tmp = error_value;
       if (tmp < 0)
         tmp = -tmp;
 
@@ -165,11 +167,15 @@ void CKodama::rotate_robot(int32_t angle, int32_t speed, int32_t (*terminating_f
   set_motor(MOTOR_LEFT, 0);
   set_motor(MOTOR_RIGHT, 0);
   timer.delay_ms(20);
+
+  #endif
 }
 
 
 void CKodama::go_forward(int32_t distance, int32_t speed, int32_t (*terminating_func)())
 {
+  #ifdef USE_IMU
+
   class CPID pid( PID_FORWARD_KP,
                   PID_FORWARD_KI,
                   PID_FORWARD_KD,
@@ -178,7 +184,7 @@ void CKodama::go_forward(int32_t distance, int32_t speed, int32_t (*terminating_
 
   imu_read();
 
-  int32_t required_angle = 0 + get_imu_result()->yaw;
+  int32_t required_angle = 0 + imu_get()->yaw;
   int32_t distance_end = get_encoder_distance() + distance;
 
   int32_t speed_ = 0;
@@ -198,7 +204,7 @@ void CKodama::go_forward(int32_t distance, int32_t speed, int32_t (*terminating_
 
       imu_read();
 
-      int32_t dif_speed = (int32_t)pid.process(required_angle - get_imu_result()->yaw);
+      int32_t dif_speed = (int32_t)pid.process(required_angle - imu_get()->yaw);
 
       if (speed_ < speed)
         speed_++;
@@ -212,4 +218,6 @@ void CKodama::go_forward(int32_t distance, int32_t speed, int32_t (*terminating_
   set_motor(MOTOR_RIGHT, 0);
 
   timer.delay_ms(20);
+
+  #endif
 }
