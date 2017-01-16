@@ -62,7 +62,6 @@ int32_t CKodama::init_()
     return -40000 + init_res;
   #endif
 
-
   #ifdef USE_RGB
   if ((init_res = rgb_init()) < 0)
     return -50000 + init_res;
@@ -71,7 +70,7 @@ int32_t CKodama::init_()
   #ifdef USE_IMU
   if ((init_res = imu_init(&i2c)) < 0)
     return -60000 + init_res;
-  #endif 
+  #endif
 
   #ifdef USE_CAMERA
   camera_init();
@@ -87,8 +86,9 @@ int32_t CKodama::init_()
     return -80000 + init_res;
   #endif
 
-
-
+  #ifdef USE_MLX90621
+  ir_init(&i2c);
+  #endif
 
   return init_res;
 }

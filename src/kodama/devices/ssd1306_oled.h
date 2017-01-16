@@ -4,6 +4,10 @@
 
 #include <i2c.h>
 
+
+#define IMAGE_WIDTH  ((unsigned int)128)
+#define IMAGE_HEIGHT ((unsigned int)64)
+
 //display size
 #define SSD1306_WIDTH               ((unsigned int)128)
 #define SSD1306_HEIGHT              ((unsigned int)64)
@@ -30,12 +34,16 @@ class CSSD1306OLED
     int oled_lcd_init(class CI2C *i2c_);
     void oled_lcd_clear();
     void oled_lcd_refresh();
-    void oled_lcd_demo();
+    void oled_lcd_put_bitmap(unsigned char *image, unsigned int x_offset = 0);
+    void oled_put_square(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char color_);
     void oled_lcd_put_pixel(unsigned int x, unsigned int y, unsigned char value);
+    unsigned char oled_lcd_get_pixel(unsigned int x, unsigned int y);
 
   private:
     void send_command(uint8_t command);
     void setpos(uint8_t x, uint8_t y);
+    unsigned int bitmap_decompress(unsigned char *image_, unsigned int x, unsigned int y);
+
 
 };
 

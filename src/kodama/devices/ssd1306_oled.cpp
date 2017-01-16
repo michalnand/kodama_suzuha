@@ -4,8 +4,6 @@
 #include <stdint.h>
 
 
-#include "image.h"
-
 
 const uint8_t ssd1306_init_sequence [] =
 {	// Initialization Sequence
@@ -91,49 +89,44 @@ void CSSD1306OLED::oled_lcd_clear()
 }
 
 
-void CSSD1306OLED::oled_lcd_demo()
+void CSSD1306OLED::oled_lcd_put_bitmap(unsigned char *image, unsigned int x_offset)
 {
-  unsigned int loops;
-  unsigned int y, x;
-
-  for (y = 0; y < SSD1306_HEIGHT; y++)
-    for (x = 0; x < SSD1306_WIDTH; x++)
-      oled_lcd_put_pixel(x, y, x&1);
-
-  oled_lcd_refresh();
-  loops = 10000000;
-  while (loops--) __asm("nop");
+  unsigned int x, y, ofs = 0;
 
 
   for (y = 0; y < SSD1306_HEIGHT; y++)
     for (x = 0; x < SSD1306_WIDTH; x++)
-      oled_lcd_put_pixel(x, y, y&1);
+      oled_lcd_put_pixel((x + ofs)%SSD1306_WIDTH, y, bitmap_decompress(image, (x + x_offset)%SSD1306_WIDTH, y));
 
   oled_lcd_refresh();
-  loops = 10000000;
-  while (loops--) __asm("nop");
+}
 
-  for (y = 0; y < SSD1306_HEIGHT; y++)
-    for (x = 0; x < SSD1306_WIDTH; x++)
-      oled_lcd_put_pixel(x, y, ((x+y)%8) < 4);
 
-  oled_lcd_refresh();
-  loops = 10000000;
-  while (loops--) __asm("nop");
 
-  unsigned int ofs = 0;
-  while (1)
+void CSSD1306OLED::oled_put_square(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned char color_)
+{
+  unsigned int i, count = (height*width);
+  unsigned int color = ((height*width)*(unsigned int)color_)/(unsigned int)255;
+  static unsigned int oled_rnd = 0;
+
+  for (i = 0; i < count; i++)
   {
-    for (y = 0; y < SSD1306_HEIGHT; y++)
-      for (x = 0; x < SSD1306_WIDTH; x++)
-      {
-        oled_lcd_put_pixel((x + ofs)%SSD1306_WIDTH, y, bitmap_decompress(image, x, y));
-      }
+    unsigned int x_, y_;
 
-    ofs++;
-    oled_lcd_refresh();
+    if (color > 0)
+    {
+      oled_rnd+= 104729;
+      //oled_rnd = math.rand();
+
+      x_ = (oled_rnd%count)%width;
+      y_ = (oled_rnd%count)/width;
+
+      oled_lcd_put_pixel(x_ + x, y_ + y, 1);
+      color--;
+    }
   }
 }
+
 
 
 void CSSD1306OLED::oled_lcd_put_pixel(unsigned int x, unsigned int y, unsigned char value)
@@ -154,6 +147,22 @@ void CSSD1306OLED::oled_lcd_put_pixel(unsigned int x, unsigned int y, unsigned c
   image_buffer[y/8][x] = tmp;
 }
 
+unsigned char CSSD1306OLED::oled_lcd_get_pixel(unsigned int x, unsigned int y)
+{
+	if (x > SSD1306_WIDTH)
+    return 0;
+
+  if (y > SSD1306_HEIGHT)
+    return 0;
+
+  unsigned char tmp = image_buffer[y/8][x];
+
+	if (tmp&(1<<(y&7)))
+		return 1;
+
+	return 0;
+}
+
 void CSSD1306OLED::setpos(uint8_t x, uint8_t y)
 {
   i2c->Start();
@@ -168,4 +177,12 @@ void CSSD1306OLED::setpos(uint8_t x, uint8_t y)
 void CSSD1306OLED::send_command(uint8_t command)
 {
   i2c->write_reg(SSD1306_ADDRESS, 0x00, command);
+}
+
+unsigned int CSSD1306OLED::bitmap_decompress(unsigned char *image_, unsigned int x, unsigned int y)
+{
+ unsigned int idx = (x/8) + y*(IMAGE_WIDTH/8);
+ unsigned int ofs = x&0x07;
+ if (image_[idx]&(1<<ofs)) return 1;
+  return 0;
 }

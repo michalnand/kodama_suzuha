@@ -55,6 +55,10 @@ class CKodama: public CGPIO, public CError, public CTerminal, public CMotor, pub
 #ifdef USE_VL530X
 , public CVL53L0X
 #endif
+
+#ifdef USE_MLX90621
+, public CMLX90621
+#endif
 {
   private:
     int32_t ms_dt;

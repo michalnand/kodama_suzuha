@@ -15,7 +15,8 @@
 #define USE_CAMERA
 #define USE_OLED_LCD
 #define USE_VL530X
-#define USE_WIFI
+//#define USE_WIFI
+#define USE_MLX90621
 
 
 

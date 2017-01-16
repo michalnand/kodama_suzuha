@@ -7,6 +7,7 @@
 #include "ssd1306_oled.h"
 #include "vl53l0x.h"
 #include "wifi.h"
+#include "mlx90621.h"
 
 #include <i2c.h>
 

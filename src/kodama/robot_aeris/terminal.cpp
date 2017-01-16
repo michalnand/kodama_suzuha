@@ -251,6 +251,14 @@ void CTerminal::putx(uint32_t n)
 void CTerminal::putf(float n, unsigned int decimal_places)
 {
   unsigned int i, power = 1;
+
+  char sgn = ' ';
+  if (n < 0)
+  {
+    sgn = '-';
+    n = -n;
+  }
+
   for (i = 0; i < decimal_places; i++)
     power*= 10;
 
@@ -259,6 +267,7 @@ void CTerminal::putf(float n, unsigned int decimal_places)
   if (frac_part < 0)
     frac_part = -frac_part;
 
+  putchar(sgn);
   puti(int_part);
   putchar('.');
   puti(frac_part);

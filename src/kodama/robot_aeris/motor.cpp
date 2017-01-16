@@ -1,8 +1,13 @@
 #include "motor.h"
+#include "config.h"
 
-
-#define DRV8830_LEFT_ADDRESS		0xC0
-#define DRV8830_RIGHT_ADDRESS	 0xC2
+#ifdef AERIS_REV_3
+  #define DRV8830_LEFT_ADDRESS		0xC2
+  #define DRV8830_RIGHT_ADDRESS	 0xC6
+#else
+  #define DRV8830_LEFT_ADDRESS		0xC0
+  #define DRV8830_RIGHT_ADDRESS	 0xC2
+#endif
 
 #define DRV8830_CONTROL_REG		 0x00
 #define DRV8830_FAULT_REG			 0x01
