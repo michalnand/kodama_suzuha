@@ -1,0 +1,8 @@
+#/bin/bash
+
+device=avr
+echo configuring for device $device
+
+if [ "$device" == "avr" ] ; then
+	cp makefiles/Makefile_avr Makefile
+fi
