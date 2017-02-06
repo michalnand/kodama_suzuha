@@ -1,6 +1,52 @@
 #include "usr.h"
 #include "image.h"
 
+TGpio<TGPIOB, 5, GPIO_MODE_OUT> led;
+
+
+void blink_idle()
+{
+  static unsigned int state = 0;
+  if (state != 0)
+  {
+    state = 0;
+    led = 1;
+  }
+  else
+  {
+    state = 1;
+    led = 0;
+  }
+}
+
+class CAPDS9950 rgb;
+
+void sensor()
+{
+  rgb.read();
+
+  terminal.printf("%u [%u %u %u] %u\n"  , rgb.result.a,
+                                          rgb.result.r,
+                                          rgb.result.g,
+                                          rgb.result.b,
+                                          rgb.result.proximity);
+}
+
+void usr_main()
+{
+  timer.add_task(blink_idle, 300, false);
+  timer.add_task(sensor, 500);
+
+  rgb.init();
+
+  while (1)
+  {
+    timer.main();
+  }
+}
+
+
+/*
 TGpio<TGPIOB, 15, GPIO_MODE_OUT> led;
 TGpio<TGPIOB, 9, GPIO_MODE_IN_PULLUP> key;
 
@@ -95,3 +141,4 @@ void usr_main()
     ir_demo();
   }
 }
+*/
