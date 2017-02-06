@@ -18,11 +18,7 @@ OBJCOPY = $(GCCPREFIX)objcopy
 OBJDUMP = $(GCCPREFIX)objdump
 SIZE = $(GCCPREFIX)size
 
-#CXXFLAGS = -O2 -Os -s  -Wall -Wextra -pedantic -std=c++11  -fno-rtti -fno-exceptions $(INC)
-#CXXFLAGS+= -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align
-#CXXFLAGS+= $(TARGET) -fdata-sections -ffunction-sections
-
-CXXFLAGS = -c -O2 -Os -Wall -Wextra -pedantic -std=c++11 -fno-rtti -fno-exceptions $(INC) -g $(TARGET)
+CXXFLAGS = -c -O2 -Os -Wall -Wextra -pedantic -std=c++11 -fno-rtti -fno-exceptions $(INC) -g $(TARGET) -fdata-sections -ffunction-sections
 
 LDFLAGS = $(TARGET) -Wl,--gc-sections
 
@@ -40,7 +36,7 @@ $(ELF): $(CXX_OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(CXX_OBJS) $(OBJS)
 
 %.o: %.cpp
-	$(CXX) -c $(CXXFLAGS) $< -o $@
+	$(CXX) $(CXXFLAGS) $< -o $@
 
 CLEAN_FILES = $(shell find -name '*.o')
 CLEAN_FILES+= bin/main*

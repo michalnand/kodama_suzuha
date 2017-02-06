@@ -47,7 +47,7 @@ template <int input_size, int output_size, int hard_locations_count, class int_t
     {
       unsigned int j;
       unsigned int min_idx = 0;
-      float min_value = 100000000, tmp;
+      int_type min_value = 32000, tmp;
       for (j = 0; j < used_hard_locations; j++)
         if ((tmp = hard_locations[j].distance(input)) < min_value)
         {
@@ -73,7 +73,7 @@ template <int input_size, int output_size, int hard_locations_count, class int_t
     {
       unsigned int j;
       unsigned int min_idx = 0;
-      float min_value = 100000000, tmp;
+      int_type min_value = 32000, tmp;
       for (j = 0; j < used_hard_locations; j++)
         if ((tmp = hard_locations[j].distance(input)) < min_value)
         {

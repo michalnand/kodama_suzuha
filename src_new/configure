@@ -1,0 +1,17 @@
+#/bin/bash
+
+device=avr
+#device=aeris
+
+echo configuring for device $device
+
+if [ "$device" == "avr" ] ; then
+	cp makefiles/Makefile_avr Makefile
+	cp makefiles/kodama_config_avr.h kodama_config.h
+fi
+
+
+if [ "$device" == "aeris" ] ; then
+	cp makefiles/Makefile_aeris Makefile
+	cp makefiles/kodama_config_aeris.h kodama_config.h
+fi

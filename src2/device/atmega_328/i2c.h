@@ -21,6 +21,13 @@ class CI2C: public CI2C_Interface
 
     unsigned char read_register(unsigned char device_address, unsigned char register_address);
     void write_register_multi(unsigned char device_address, unsigned char register_address, unsigned char *buffer, unsigned int buffer_length);
+
+  private:
+    void scl_high();
+    void scl_low();
+
+    void sda_high();
+    void sda_low();
 };
 
 

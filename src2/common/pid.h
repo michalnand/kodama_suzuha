@@ -5,8 +5,7 @@
 
 /* @breef discrete PID controller implementation with antiwindup
 
-   in constructor enter
-   kp, ki, kd
+   in constructor set kp, ki, kd
    and output limitatation output_range_
    output will be limited into interval <-output_range_, output_range_>
 
@@ -14,7 +13,7 @@
    for float arithmetics (default) call class CPID<float> my_pid(kp, ki, kd, limit)
 
    @note kp, ki, kd constant are divided by PID_FRACTION value;
-   if you wish proporional gain KP = 3.74, you enter kp = 3.74*PID_FRACTION
+   if you wish proporional gain kp = 3.741, you enter kp = 3.741*PID_FRACTION
    (similary ki and kd)
 */
 
@@ -34,7 +33,7 @@ template <class int_type = float> class CPID
     //@param ki - integration constant, ki = PID_FRACTION, means ki = gain x1
     //@param kd - derivative constant, kd = PID_FRACTION, means kd = gain x1
     //@param output_range - maximum otput range, limits output into <-output_range, output_range>
-    CPID(int_type kp, int_type ki, int_type kd, int_type output_range_)
+    CPID(int_type kp = 0, int_type ki = 0, int_type kd = 0, int_type output_range_ = 0)
     {
       init(kp, ki, kd, output_range_);
     }
@@ -52,7 +51,7 @@ template <class int_type = float> class CPID
       e2 = 0;
 
       k0 = kp + ki + kd;
-      k1 = -kp - kd;
+      k1 = -kp - 2*kd;
       k2 = kd;
 
       u = 0;
