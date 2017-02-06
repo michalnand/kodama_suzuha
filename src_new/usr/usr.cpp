@@ -24,7 +24,11 @@ class CAPDS9950 rgb;
 void sensor()
 {
   rgb.read();
+}
 
+
+void main_loop()
+{
   terminal.printf("%u [%u %u %u] %u\n"  , rgb.result.a,
                                           rgb.result.r,
                                           rgb.result.g,
@@ -34,10 +38,11 @@ void sensor()
 
 void usr_main()
 {
-  timer.add_task(blink_idle, 300, false);
-  timer.add_task(sensor, 500);
-
   rgb.init();
+
+  timer.add_task(blink_idle, 200, false);
+  timer.add_task(sensor, 10, false);
+  timer.add_task(main_loop, 300);
 
   while (1)
   {
