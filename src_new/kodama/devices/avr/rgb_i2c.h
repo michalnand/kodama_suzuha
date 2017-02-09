@@ -1,10 +1,11 @@
 #ifndef _RGB_I2C_H_
 #define _RGB_I2C_H_
 
-#include <kodama.h>
+#include "gpio.h"
 
 #define RGB_SENSOR_COUNT     9
 
+/*
 #define RGB_SCL              0
 #define RGB_SCL_GPIO         TGPIOB
 
@@ -34,6 +35,39 @@
 
 #define RGB_SDA8             8
 #define RGB_SDA8_GPIO        TGPIOD
+*/
+
+
+
+#define RGB_SCL              0
+#define RGB_SCL_GPIO         TGPIOB
+
+#define RGB_SDA0             7
+#define RGB_SDA0_GPIO        TGPIOD
+
+#define RGB_SDA1             6
+#define RGB_SDA1_GPIO        TGPIOD
+
+#define RGB_SDA2             5
+#define RGB_SDA2_GPIO        TGPIOD
+
+#define RGB_SDA3             4
+#define RGB_SDA3_GPIO        TGPIOD
+
+#define RGB_SDA4             3
+#define RGB_SDA4_GPIO        TGPIOD
+
+#define RGB_SDA5             2
+#define RGB_SDA5_GPIO        TGPIOD
+
+#define RGB_SDA6             7
+#define RGB_SDA6_GPIO        TGPIOD
+
+#define RGB_SDA7             6
+#define RGB_SDA7_GPIO        TGPIOD
+
+#define RGB_SDA8             5
+#define RGB_SDA8_GPIO        TGPIOD
 
 struct sRGBResult
 {
@@ -44,6 +78,7 @@ struct sRGBResult
 class CRGB_I2C
 {
   public:
+    unsigned char read_result[RGB_SENSOR_COUNT];
     struct sRGBResult result[RGB_SENSOR_COUNT];
 
     TGpio<RGB_SCL_GPIO, RGB_SCL, GPIO_MODE_IN_FLOATING>   scl;
@@ -62,14 +97,17 @@ class CRGB_I2C
     CRGB_I2C();
     ~CRGB_I2C();
 
-    int init();
+    uint16_t init();
     void read();
 
+  protected:
     void write_reg(unsigned char dev_adr, unsigned char reg_adr, unsigned char value);
 
-
-  protected:
     void write(unsigned char b);
+
+    //fill read_result array with readed byte
+    void read_i2c(unsigned char ack);
+
     void start();
     void stop();
 
@@ -79,10 +117,7 @@ class CRGB_I2C
     void set_low_sda();
 
     uint16_t read_sda();
-
-    void delay();
 };
 
-extern class CRGB_I2C rgb_i2c;
 
 #endif

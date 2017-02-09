@@ -43,9 +43,9 @@ CCFLAGS+= $(TARGET) -fdata-sections -ffunction-sections -nostdlib
 
 CXXFLAGS = -c -O2 -Os -s -Wall -Wextra -pedantic -std=c++11  -fno-rtti -fno-exceptions $(INC)
 CXXFLAGS+= -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align
-CXXFLAGS+= $(TARGET) -fdata-sections -ffunction-sections # -nostdlib
+CXXFLAGS+= $(TARGET) -fdata-sections -ffunction-sections -nostdlib
 
-LDFLAGS = -T$(LDSCRIPT) $(TARGET) -mthumb -Wl,--gc-sections --specs=nosys.specs #-nostdlib
+LDFLAGS = -T$(LDSCRIPT) $(TARGET) -mthumb -Wl,--gc-sections --specs=nosys.specs -nostdlib
 
 
 C_OBJS = $(C_SRCS:.c=.o)

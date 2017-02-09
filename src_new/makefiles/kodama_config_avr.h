@@ -23,4 +23,8 @@
 #define I2C_SDA_PIN                 4
 #define I2C_SPEED                   5
 
+#define LED_GPIO                    TGPIOB
+#define LED_PIN                     5
+
+
 #endif

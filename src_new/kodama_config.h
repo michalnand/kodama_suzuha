@@ -21,8 +21,13 @@
 #define I2C_PORT                    TGPIOB
 #define I2C_SCL_PIN                 6
 #define I2C_SDA_PIN                 7
-#define I2C_SPEED                   120
+#define I2C_SPEED                   100 
 
+#define LED_GPIO                    TGPIOB
+#define LED_PIN                     15
+
+#define KEY_GPIO                    TGPIOB
+#define KEY_PIN                     9
 
 #define AERIS_REV_3
 

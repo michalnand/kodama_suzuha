@@ -139,6 +139,12 @@ void CTimer::delay_ms(unsigned long int ms_time)
     __asm("nop");
 }
 
+void CTimer::delay_loops(unsigned long int loops)
+{
+  while (loops--)
+    __asm("nop");
+}
+
 ISR(TIMER0_COMPA_vect)
 {
   for (unsigned char i = 0; i < TIMERS_COUNT; i++)

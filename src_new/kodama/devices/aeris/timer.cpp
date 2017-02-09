@@ -135,6 +135,12 @@ void CTimer::delay_ms(unsigned int ms_time)
     __asm("nop");
 }
 
+void CTimer::delay_loops(unsigned long int loops)
+{
+  while (loops--)
+    __asm("nop");
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif

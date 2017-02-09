@@ -14,5 +14,8 @@
 #include "ssd1306_oled.h"
 #include "vl53l0x.h"
 #include "apds9950.h"
+#include "rgb_i2c.h"
+
+#include "line_position.h"
 
 #endif

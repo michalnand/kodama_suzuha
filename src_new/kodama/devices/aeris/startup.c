@@ -19,10 +19,21 @@ void __attribute__((interrupt("IRQ"))) Default_Handler()
 }
 
 
+//  Default interrupt handler
+void __attribute__((interrupt("IRQ"))) HardFault_Handler()
+{
+  while (1)
+  {
+    __asm("nop");
+    GPIOB->BRR|= (1<<15);
+  }
+}
+
+
 void Reset_Handler() __attribute__((naked, aligned(2)));
 /* Weak definitions of handlers point to Default_Handler if not implemented */
 void NMI_Handler()          __attribute__ ((weak, alias("Default_Handler")));
-void HardFault_Handler()          __attribute__ ((weak, alias("Default_Handler")));
+// void HardFault_Handler()          __attribute__ ((weak, alias("Default_Handler")));
 void MemManage_Handler()          __attribute__ ((weak, alias("Default_Handler")));
 void BusFault_Handler()          __attribute__ ((weak, alias("Default_Handler")));
 void UsageFault_Handler()          __attribute__ ((weak, alias("Default_Handler")));
@@ -223,7 +234,6 @@ inline void static_init()
   }
 }
 
-/*
 
 void __dso_handle()
 {
@@ -234,7 +244,6 @@ void __aeabi_atexit()
 {
 
 }
-*/
 
 
 void Reset_Handler(void)

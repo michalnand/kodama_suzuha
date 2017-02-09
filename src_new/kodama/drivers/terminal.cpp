@@ -157,7 +157,8 @@ void CTerminal::printf(const char *str, ...)
 	     		case '%': putchar('%'); break;
 
           #ifdef TERMINAL_USE_FLOAT
-          case 'f': putf(va_arg(args, double), 3); break;
+          //case 'f': putf(va_arg(args, double), 3); break;
+          case 'f': puti(va_arg(args, int)); break;
           #endif
 	    	}
 

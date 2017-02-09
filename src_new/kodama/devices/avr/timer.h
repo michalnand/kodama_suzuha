@@ -51,6 +51,8 @@ class CTimer
     unsigned long int get_time();
 
     void delay_ms(unsigned long int ms_time);
+
+    void delay_loops(unsigned long int loops);
 };
 
 extern class CTimer timer;
